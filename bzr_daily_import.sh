@@ -74,9 +74,9 @@ git submodule update
 make -C deps get-random
 
 # Make it blaringly obvious to everyone that this is a git build when they start up Julia
-COMMIT=$(git log --pretty=format:'%h' -n 1)
-echo "0.2.0+git$COMMIT" > VERSION
-echo "Syncing commit $COMMIT."
+DATECOMMIT=$(git log --pretty=format:'%cd.%h' --date=short -n 1 | sed 's/-//g')
+echo "0.2.0+nightly$DATECOMMIT" > VERSION
+echo "Syncing commit 0.2.0+nightly$DATECOMMIT."
 cd ..
 
 # Now go into the bzr branch and copy everything over
@@ -89,10 +89,10 @@ cp -r ../julia-${JULIA_GIT_BRANCH}/* .
 cp -r ../debian-${DEBIAN_GIT_BRANCH}/debian .
 
 # Also, increment the current debian changelog, so we get git version tagged binaries
-dch -v $(cat VERSION) -b "nightly git build"
+dch -v $(cat VERSION) "nightly git build"
 
 bzr add
-bzr ci -m "Manual import commit ${COMMIT} from ${JULIA_GIT_URL}/${JULIA_GIT_BRANCH}" || true
+bzr ci -m "Manual import commit ${DATECOMMIT} from ${JULIA_GIT_URL}/${JULIA_GIT_BRANCH}" || true
 bzr push lp:${TEAM}/${PROJECT}/${BZR_BRANCH}
 cd ..
 
