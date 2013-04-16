@@ -12,7 +12,6 @@ if len(passing_builds):
     commits_in_master = [unicode(commit) for commit in commits_in_master.split("\n")]
 
     for p in passing_builds:
-        sys.stderr.write('Testing ' + p[u'commit'])
         if p[u'commit'] in commits_in_master:
             print p[u'commit']
             sys.exit( 0 )
