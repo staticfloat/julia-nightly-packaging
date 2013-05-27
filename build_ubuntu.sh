@@ -2,10 +2,8 @@
 set -e
 
 # This script invoked by a cron job every X hours
-# $JULIA_HOME/contrib/bzr_daily_import.sh  > import.log
-#
 # This script functions best when the following are installed:
-#   wget, git, bzr, dch, make, python (with the "requests" module installed) for the travis-ci API integration
+#   wget, git, bzr, dch, make, python (with the "requests" module installed, for Travis-ci API)
 
 
 # Note that in order to push to lp:~staticfloat/julianightlies/trunk, you need my GPG private key
