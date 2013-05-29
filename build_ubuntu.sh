@@ -71,9 +71,8 @@ git submodule update
 # Hack to get around our lack of packaging of Rmath
 make -C deps get-random
 
-# Make it blaringly obvious to everyone that this is a git build when they start up Julia
-DATECOMMIT=$(git log --pretty=format:'%cd.%h' --date=short -n 1 | sed 's/-//g')
-echo "0.2.0+nightly$DATECOMMIT" > VERSION
+# Make it blaringly obvious to everyone that this is a git build when they start up Julia-
+DATECOMMIT=$(git log --pretty=format:'%cd' --date=short -n 1 | sed 's/-//g')
 echo "Syncing commit 0.2.0+nightly$DATECOMMIT."
 cd ..
 
@@ -87,7 +86,7 @@ cp -r ../julia-${JULIA_GIT_BRANCH}/* .
 cp -r ../debian-${DEBIAN_GIT_BRANCH}/debian .
 
 # Also, increment the current debian changelog, so we get git version tagged binaries
-dch -v $(cat VERSION) "nightly git build"
+dch -v "0.2.0+nightly$DATECOMMIT" "nightly git build"
 
 bzr add
 bzr ci -m "Manual import commit ${DATECOMMIT} from ${JULIA_GIT_URL}/${JULIA_GIT_BRANCH}" || true

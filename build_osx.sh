@@ -51,10 +51,6 @@ git reset --hard
 # Make sure there's nothing laying around from forced pushes/rebases, etc...
 #git clean -fdx
 
-# Make it blaringly obvious to everyone that this is a git build when they start up Julia
-DATECOMMIT=$(git log --pretty=format:'%cd.%h' --date=short -n 1 | sed 's/-//g')
-echo "0.2.0+nightly$DATECOMMIT" > VERSION
-
 # Build julia
 make OPENBLAS_DYNAMIC_ARCH=1 testall
 
@@ -84,7 +80,7 @@ platypus -P Julia.platypus -y ${DMG_DIR}/Julia.app
 # Build a .dmg with the .app inside
 cp -f Julia.icns ${DMG_DIR}/.VolumeIcon.icns
 cp -f ${ORIG_DIR}/Julia.DS_Store ${DMG_DIR}/.DS_Store
-ln -fs /Applications/ ${DMG_DIR}/Applications
+ln -fs /Applications ${DMG_DIR}/Applications
 hdiutil create "${BUILD_DIR}/Julia-0.2-pre.dmg" -ov -volname "Julia" -srcfolder "$DMG_DIR"
 
 echo "Packaged .dmg available at ${BUILD_DIR}/Julia-0.2-pre.dmg"
