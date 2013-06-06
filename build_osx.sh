@@ -1,5 +1,6 @@
 #!/bin/bash
 set -e
+set -x
 
 # This script invoked by a cron job every X hours
 # This script functions best when the following are installed:
@@ -33,6 +34,7 @@ fi
 
 # Go into our checkout of JULIA_GIT_URL
 cd julia-${JULIA_GIT_BRANCH}
+git reset --hard
 git pull origin master
 
 # Find the last commit that passed a Travis build
@@ -47,11 +49,10 @@ if [[ "$?" != 0 ]]; then
         echo "Couldn't checkout last good commit, going with HEAD!"
         git checkout HEAD
 fi
-git reset --hard
-# Make sure there's nothing laying around from forced pushes/rebases, etc...
-#git clean -fdx
 
 # Build julia
+export CFLAGS="-mmacosx-version-min=10.6"
+export LDFLAGS="-mmacosx-version-min=10.6"
 make OPENBLAS_DYNAMIC_ARCH=1 testall
 
 if [[ "$?" != "0" ]]; then
@@ -71,16 +72,6 @@ fi
 # Make special packaging makefile
 make OPENBLAS_DYNAMIC_ARCH=1
 
-# Patch and run platypus file.  Note that these paths assume platypus (the CLI interface) is in your path, and Platypus (the GUI) is installed to /Applications/
-mkdir -p $DMG_DIR
-sed -i -e "s_/Users/viral/julia_${BUILD_DIR}/julia-${JULIA_GIT_BRANCH}_" Julia.platypus
-sed -i -e "s_/usr/local/share/platypus/_/Applications/Platypus.app/Contents/Resources/_" Julia.platypus
-platypus -P Julia.platypus -y ${DMG_DIR}/Julia.app
+mv *.dmg "${BUILD_DIR}/"
 
-# Build a .dmg with the .app inside
-cp -f Julia.icns ${DMG_DIR}/.VolumeIcon.icns
-cp -f ${ORIG_DIR}/Julia.DS_Store ${DMG_DIR}/.DS_Store
-ln -fs /Applications ${DMG_DIR}/Applications
-hdiutil create "${BUILD_DIR}/Julia-0.2-pre.dmg" -ov -volname "Julia" -srcfolder "$DMG_DIR"
-
-echo "Packaged .dmg available at ${BUILD_DIR}/Julia-0.2-pre.dmg"
+echo "Packaged .dmg available at $(ls ${BUILD_DIR}/*.dmg)"
