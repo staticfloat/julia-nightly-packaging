@@ -14,6 +14,7 @@ DEBIAN_GIT_URL="https://github.com/staticfloat/julia-debian.git"
 JULIA_GIT_BRANCH=master
 DEBIAN_GIT_BRANCH=master
 BZR_BRANCH=trunk
+BUILD_DIR=/tmp/julia-packaging
 
 cd $(dirname $0)
 ORIG_DIR=$(pwd)
@@ -24,8 +25,8 @@ if [[ -d .git ]]; then
 fi
 
 # Store everything in a temp dir
-mkdir -p /tmp/julia-daily-packaging
-cd /tmp/julia-daily-packaging
+mkdir -p $BUILD_DIR
+cd $BUILD_DIR
 
 # Get the git branch
 if test ! -d julia-${JULIA_GIT_BRANCH}; then
