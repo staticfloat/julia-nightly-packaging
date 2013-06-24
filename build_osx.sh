@@ -5,6 +5,10 @@ set -x
 # This script invoked by a cron job every X hours
 # This script functions best when the following are installed:
 #   git, python (with the "requests" module installed, for Travis-CI API), playtpus (must be in path)
+#
+# You must install Winston from source for proper bundling. This script assumes you have copied the
+#  relevant .julia/ directory to the directory pointed to by $JULIA_PKGDIR below.
+
 
 
 # define variables
@@ -13,6 +17,8 @@ JULIA_GIT_BRANCH=master
 BUILD_DIR=/tmp/julia-packaging
 DMG_DIR=$BUILD_DIR/dmgroot
 
+# This is the directory where my .julia directory is stored with cairo, tk, etc... all precompiled and ready
+export JULIA_PKGDIR=$(echo ~)/julia_packaging_home
 
 # cd to the location of this script
 cd $(dirname $0)
@@ -64,7 +70,7 @@ fi
 cd contrib/mac/app
 
 # Check that Winston is installed
-if [ ! -d ~/.julia/Winston ]; then
+if [ ! -d $JULIA_PKGDIR/.julia/Winston ]; then
     echo "ERROR: Winston not installed to ~/.julia; remedy this and try again!" 1>&2
     exit -1
 fi
