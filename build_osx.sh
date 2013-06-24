@@ -57,8 +57,6 @@ if [[ "$?" != 0 ]]; then
 fi
 
 # Build julia
-export CFLAGS="-mmacosx-version-min=10.6"
-export LDFLAGS="-mmacosx-version-min=10.6"
 make OPENBLAS_DYNAMIC_ARCH=1 testall
 
 if [[ "$?" != "0" ]]; then
