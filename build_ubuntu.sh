@@ -74,7 +74,6 @@ make -C deps get-random
 
 # This necessary to get proper VERSION stuffage on startup. :)
 make COMMIT
-mv COMMIT COMMIT.backup
 
 # Make it blaringly obvious to everyone that this is a git build when they start up Julia-
 DATECOMMIT=$(git log --pretty=format:'%cd' --date=short -n 1 | sed 's/-//g')
