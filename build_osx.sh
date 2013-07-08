@@ -57,6 +57,8 @@ if [[ "$?" != 0 ]]; then
 fi
 
 # Build julia
+make cleanall
+make -C deps distclean-uv # This is the most common failure mode
 make OPENBLAS_DYNAMIC_ARCH=1 testall
 
 if [[ "$?" != "0" ]]; then
@@ -76,6 +78,7 @@ fi
 # Make special packaging makefile
 make OPENBLAS_DYNAMIC_ARCH=1
 
-mv *.dmg "${BUILD_DIR}/"
+# We force its name to be Julia-0.2-pre.dmg
+mv *.dmg "${BUILD_DIR}/Julia-0.2-pre.dmg"
 
 echo "Packaged .dmg available at $(ls ${BUILD_DIR}/*.dmg)"
