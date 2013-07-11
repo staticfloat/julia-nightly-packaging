@@ -72,9 +72,10 @@ git submodule update
 # Hack to get around our lack of packaging of Rmath
 make -C deps get-random
 
-# This necessary to get proper VERSION stuffage on startup. :)
-make COMMIT
-mv COMMIT COMMIT.backup
+# Work around our lack of git on buildd servers
+make -C base build_h.jl.phony
+cat base/build_h.jl | grep -v "const [^B]" > base/build_h.jl.nogit
+rm base/build_h.jl
 
 # Make it blaringly obvious to everyone that this is a git build when they start up Julia-
 DATECOMMIT=$(git log --pretty=format:'%cd' --date=short -n 1 | sed 's/-//g')
