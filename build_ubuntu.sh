@@ -49,7 +49,7 @@ fi
 
 # Go into our checkout of JULIA_GIT_URL
 cd julia-${JULIA_GIT_BRANCH}
-git pull origin master
+git pull origin ${JULIA_GIT_BRANCH}
 
 # Find the last commit that passed a Travis build
 LAST_GOOD_COMMIT=$(${ORIG_DIR}/get_last_good_commit.py)
@@ -58,7 +58,7 @@ if [ -z "$LAST_GOOD_COMMIT" ]; then
 	exit 1
 fi
 
-git checkout $LAST_GOOD_COMMIT
+git checkout -B ${JULIA_GIT_BRANCH} ${LAST_GOOD_COMMIT}
 if [[ "$?" != 0 ]]; then
 	echo "Couldn't detect best last commit, going with HEAD!"
 	git checkout HEAD
@@ -99,5 +99,4 @@ bzr ci -m "Manual import commit ${DATECOMMIT} from ${JULIA_GIT_URL}/${JULIA_GIT_
 bzr push lp:${TEAM}/${PROJECT}/${BZR_BRANCH}
 cd ..
 
-rm -rf ../julia-debian-master
 exit 0
