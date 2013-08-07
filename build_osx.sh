@@ -78,7 +78,7 @@ fi
 # Make special packaging makefile
 make OPENBLAS_DYNAMIC_ARCH=1
 
-# We force its name to be Julia-0.2-pre.dmg
-mv *.dmg "${BUILD_DIR}/Julia-0.2-pre.dmg"
+# We force its name to be Julia-0.2-unstable.dmg
+mv *.dmg "${BUILD_DIR}/Julia-0.2-unstable.dmg"
 
 echo "Packaged .dmg available at $(ls ${BUILD_DIR}/*.dmg)"
