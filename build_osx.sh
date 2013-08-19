@@ -18,7 +18,7 @@ BUILD_DIR=/tmp/julia-packaging
 DMG_DIR=$BUILD_DIR/dmgroot
 
 # This is the directory where my .julia directory is stored with cairo, tk, etc... all precompiled and ready
-export JULIA_PKGDIR=$(echo ~)/julia_packaging_home
+export JULIA_PKGDIR=${BUILD_DIR}/julia_packaging_home
 
 # cd to the location of this script
 cd $(dirname $0)
@@ -58,7 +58,8 @@ fi
 
 # Build julia
 make cleanall
-make -C deps distclean-uv # This is the most common failure mode
+rm -rf deps/libuv # This is the most common failure mode
+git submodule update
 make OPENBLAS_DYNAMIC_ARCH=1 testall
 
 if [[ "$?" != "0" ]]; then
@@ -71,7 +72,7 @@ cd contrib/mac/app
 
 # Check that Winston is installed
 if [ ! -d $JULIA_PKGDIR/.julia/Winston ]; then
-    echo "ERROR: Winston not installed to ~/.julia; remedy this and try again!" 1>&2
+    echo "ERROR: Winston not installed to ${JULIA_PKGDIR}/.julia; remedy this and try again!" 1>&2
     exit -1
 fi
 
