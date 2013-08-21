@@ -18,7 +18,7 @@ BUILD_DIR=/tmp/julia-packaging
 DMG_DIR=$BUILD_DIR/dmgroot
 
 # This is the directory where my .julia directory is stored with cairo, tk, etc... all precompiled and ready
-export JULIA_PKGDIR=${BUILD_DIR}/julia_packaging_home
+export JULIA_PKGDIR=$(echo ~)/julia_packaging_home/
 
 # cd to the location of this script
 cd $(dirname $0)
