@@ -6,12 +6,8 @@
 # Example:
 #   ./upload_binary.jl /tmp/Julia-0.2-pre.dmg /bin/osx/x64/0.2/julia-0.2-unstable.dmg
 
-if !haskey(ENV, "AWS_ID") || !haskey(ENV, "AWS_SECKEY")
-    error( "You must set the environment variables AWS_ID and AWS_SECKEY to access your account on AWS" )
-end
-
 if length(ARGS) != 2
-    error( "You must pass <file> and <upload key> to this script!" )
+    error( "You must pass <file> and <upload path> to this script!" )
 end
 
 file = ARGS[1]
@@ -28,10 +24,12 @@ f = open(file, "r")
 using AWS
 using AWS.S3
 
-env = AWSEnv(ENV["AWS_ID"], ENV["AWS_SECKEY"], EP_US_EAST_NORTHERN_VIRGINIA)
+env = AWSEnv()
 acl = S3.S3_ACL()
 acl.acl = "public-read"
 
 S3.put_object(env, "julialang", key, f)
 S3.put_object_acl(env, "julialang", key, acl )
 close(f)
+
+println("$key uploaded successfully")

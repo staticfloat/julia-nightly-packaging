@@ -7,7 +7,7 @@ set -x
 #   git, python (with the "requests" module installed, for Travis-CI API), playtpus (must be in path)
 #
 # You must install Winston from source for proper bundling. This script assumes you have copied the
-#  relevant .julia/ directory to the directory pointed to by $JULIA_PKGDIR below.
+#  contents of the relevant .julia/ directory to the directory pointed to by $JULIA_PKGDIR below.
 
 
 
@@ -71,8 +71,8 @@ fi
 cd contrib/mac/app
 
 # Check that Winston is installed
-if [ ! -d $JULIA_PKGDIR/.julia/Winston ]; then
-    echo "ERROR: Winston not installed to ${JULIA_PKGDIR}/.julia; remedy this and try again!" 1>&2
+if [ ! -d $JULIA_PKGDIR/Winston ]; then
+    echo "ERROR: Winston not installed to ${JULIA_PKGDIR}/; remedy this and try again!" 1>&2
     exit -1
 fi
 
@@ -82,4 +82,7 @@ make OPENBLAS_DYNAMIC_ARCH=1
 # We force its name to be Julia-0.2-unstable.dmg
 mv *.dmg "${BUILD_DIR}/Julia-0.2-unstable.dmg"
 
-echo "Packaged .dmg available at $(ls ${BUILD_DIR}/*.dmg)"
+# Upload .dmg file
+${BUILD_DIR}/julia-${JULIA_GIT_BRANCH}/julia ${ORIG_DIR}/upload_binary.jl ${BUILD_DIR}/Julia-0.2-unstable.dmg /bin/osx/x64/0.2/julia-0.2-unstable.dmg
+
+echo "Packaged .dmg available at $(ls ${BUILD_DIR}/*.dmg), and uploaded to AWS"
