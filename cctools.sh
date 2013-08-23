@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -e
+
 # Download and build cctools, distributed by Apple under the APSL and the GPLv2
 
 CCTOOLS_URL=http://www.opensource.apple.com/tarballs/cctools/cctools-829.tar.gz
@@ -19,8 +21,8 @@ cd $BUILD
 wget "$CCTOOLS_URL" -O- | tar zxv
 
 cd cctools-*
-make -C libstuff
-make -C misc install_name_tool.NEW
+make X_CFLAGS="-march=core2 -mmacosx-version-min=10.6 -Wl,-macosx_version_min,10.6 -macosx_version_min=10.6" -C libstuff
+make RC_CFLAGS="-march=core2 -mmacosx-version-min=10.6 -Wl,-macosx_version_min,10.6 -macosx_version_min=10.6" -C misc install_name_tool.NEW
 
 # Now, bundle up the tools we want
 MISC=$(pwd)/misc
@@ -33,5 +35,5 @@ echo "These programs compiled from Apple's cctools version 829, available here: 
 echo "All programs bundled are released under the APSL-2.0, available here: $APSL_URL" >> README
 
 
-cd .. && tar zcf cctools_bundle.tar.gz bundle/*
+tar zcf ../cctools_bundle.tar.gz *
 echo "Bundle successfully created at ${BUILD}/cctools_bundle.tar.gz"
