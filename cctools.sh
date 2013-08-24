@@ -23,12 +23,14 @@ wget "$CCTOOLS_URL" -O- | tar zxv
 cd cctools-*
 make X_CFLAGS="-march=core2 -mmacosx-version-min=10.6 -Wl,-macosx_version_min,10.6 -macosx_version_min=10.6" -C libstuff
 make RC_CFLAGS="-march=core2 -mmacosx-version-min=10.6 -Wl,-macosx_version_min,10.6 -macosx_version_min=10.6" -C misc install_name_tool.NEW
+make RC_CFLAGS="-march=core2 -mmacosx-version-min=10.6 -Wl,-macosx_version_min,10.6 -macosx_version_min=10.6" -C otool
 
 # Now, bundle up the tools we want
-MISC=$(pwd)/misc
+ROOT=$(pwd)
 mkdir -p ../bundle && cd ../bundle
 
-cp $MISC/install_name_tool.NEW install_name_tool
+cp $ROOT/misc/install_name_tool.NEW install_name_tool
+cp $ROOT/otool/otool.NEW otool
 
 # Make sure we've got licensing data alongside the binaries
 echo "These programs compiled from Apple's cctools version 829, available here: $CCTOOLS_URL" > README
