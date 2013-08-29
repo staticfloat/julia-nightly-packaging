@@ -41,6 +41,7 @@ fi
 # Go into our checkout of JULIA_GIT_URL
 cd julia-${JULIA_GIT_BRANCH}
 git reset --hard
+git checkout ${JULIA_GIT_BRANCH}
 git pull origin ${JULIA_GIT_BRANCH}
 
 # Find the last commit that passed a Travis build
@@ -60,7 +61,7 @@ fi
 make cleanall
 rm -rf deps/libuv # This is the most common failure mode
 git submodule update
-make OPENBLAS_DYNAMIC_ARCH=1 testall
+make USE_SYSTEM_BLAS=1 USE_BLAS64=0 testall
 
 if [[ "$?" != "0" ]]; then
     echo "ERROR: Julia did not test well, aborting!"
@@ -77,7 +78,7 @@ if [ ! -d $JULIA_PKGDIR/Winston ]; then
 fi
 
 # Make special packaging makefile
-make OPENBLAS_DYNAMIC_ARCH=1
+make USE_SYSTEM_BLAS=1 USE_BLAS64=0
 
 # We force its name to be Julia-0.2-unstable.dmg
 mv *.dmg "${BUILD_DIR}/Julia-0.2-unstable.dmg"
