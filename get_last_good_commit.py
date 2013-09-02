@@ -1,7 +1,14 @@
 #!/usr/bin/env python
 
 import requests, subprocess, os, sys
-builds = requests.get("https://api.travis-ci.org/builds/?owner_name=JuliaLang&name=julia").json()
+jsondata = requests.get("https://api.travis-ci.org/builds/?owner_name=JuliaLang&name=julia")
+
+builds = []
+try:
+    builds = jsondata.json()
+except:
+    print builds
+    raise
 
 # Get a list of passing builds
 passing_builds = [b for b in builds if b[u'result'] == 0 and b[u'duration'] != None]
