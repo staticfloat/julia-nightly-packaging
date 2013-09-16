@@ -14,7 +14,7 @@ set -x
 # define variables
 JULIA_GIT_URL="https://github.com/JuliaLang/julia.git"
 JULIA_GIT_BRANCH=master
-BUILD_DIR=/tmp/julia-packaging
+BUILD_DIR=~/tmp/julia-packaging
 DMG_DIR=$BUILD_DIR/dmgroot
 
 # This is the directory where my .julia directory is stored with cairo, tk, etc... all precompiled and ready
@@ -40,6 +40,8 @@ fi
 
 # Go into our checkout of JULIA_GIT_URL
 cd julia-${JULIA_GIT_BRANCH}
+rm -rf deps/libuv deps/Rmath # This is the most common failure mode
+git submodule update
 git reset --hard
 git checkout ${JULIA_GIT_BRANCH}
 git pull origin ${JULIA_GIT_BRANCH}
@@ -53,20 +55,13 @@ fi
 
 git checkout -B ${JULIA_GIT_BRANCH} $LAST_GOOD_COMMIT
 if [[ "$?" != 0 ]]; then
-        echo "Couldn't checkout last good commit, going with HEAD!"
-        git checkout HEAD
+        echo "Couldn't checkout last good commit, going with master/HEAD!"
+        git checkout master
 fi
 
 # Build julia
 make cleanall
-rm -rf deps/libuv # This is the most common failure mode
-git submodule update
-make USE_SYSTEM_BLAS=1 USE_BLAS64=0 testall
-
-if [[ "$?" != "0" ]]; then
-    echo "ERROR: Julia did not test well, aborting!"
-    exit -1
-fi
+make USE_SYSTEM_BLAS=1 USE_BLAS64=0 VERBOSE=1 testall
 
 # Begin packaging steps
 cd contrib/mac/app
@@ -87,3 +82,4 @@ mv *.dmg "${BUILD_DIR}/Julia-0.2-unstable.dmg"
 ${BUILD_DIR}/julia-${JULIA_GIT_BRANCH}/julia ${ORIG_DIR}/upload_binary.jl ${BUILD_DIR}/Julia-0.2-unstable.dmg /bin/osx/x64/0.2/julia-0.2-unstable.dmg
 
 echo "Packaged .dmg available at $(ls ${BUILD_DIR}/*.dmg), and uploaded to AWS"
+#echo "Don't forget to fix upload name!"
