@@ -10,12 +10,14 @@ set -x
 #  contents of the relevant .julia/ directory to the directory pointed to by $JULIA_PKGDIR below.
 
 
+JULIA_GIT_BRANCH="master"
+if [[ ! -z "$1" ]]; then
+    JULIA_GIT_BRANCH="$1"
+fi
 
 # define variables
 JULIA_GIT_URL="https://github.com/JuliaLang/julia.git"
-JULIA_GIT_BRANCH=master
 BUILD_DIR=~/tmp/julia-packaging
-DMG_DIR=$BUILD_DIR/dmgroot
 
 # This is the directory where my .julia directory is stored with cairo, tk, etc... all precompiled and ready
 export JULIA_PKGDIR=$(echo ~)/julia_packaging_home/
@@ -49,8 +51,8 @@ git pull origin ${JULIA_GIT_BRANCH}
 # Find the last commit that passed a Travis build
 LAST_GOOD_COMMIT=$(${ORIG_DIR}/get_last_good_commit.py)
 if [ -z "$LAST_GOOD_COMMIT" ]; then
-        echo "ERROR: No good commits detected!"
-        exit 1
+        echo "ERROR: No good commits detected, going with HEAD!"
+        LAST_GOOD_COMMIT="HEAD"
 fi
 
 git checkout -B ${JULIA_GIT_BRANCH} $LAST_GOOD_COMMIT
@@ -75,11 +77,16 @@ fi
 # Make special packaging makefile
 make USE_SYSTEM_BLAS=1 USE_BLAS64=0
 
-# We force its name to be Julia-0.2-unstable.dmg
-mv *.dmg "${BUILD_DIR}/Julia-0.2-unstable.dmg"
+DMG_TARGET="julia-0.2-unstable.dmg"
+
+if [[ "$JULIA_GIT_BRANCH" != "master" ]]; then
+    DMG_TARGET="julia-0.2-$(basename $JULIA_GIT_BRANCH)-unstable.dmg"
+fi
+
+# We force its name to be julia-0.2-unstable.dmg
+mv *.dmg "${BUILD_DIR}/$DMG_TARGET"
 
 # Upload .dmg file
-${BUILD_DIR}/julia-${JULIA_GIT_BRANCH}/julia ${ORIG_DIR}/upload_binary.jl ${BUILD_DIR}/Julia-0.2-unstable.dmg /bin/osx/x64/0.2/julia-0.2-unstable.dmg
+${BUILD_DIR}/julia-${JULIA_GIT_BRANCH}/julia ${ORIG_DIR}/upload_binary.jl ${BUILD_DIR}/$DMG_TARGET /bin/osx/x64/0.2/$DMG_TARGET
 
-echo "Packaged .dmg available at $(ls ${BUILD_DIR}/*.dmg), and uploaded to AWS"
-#echo "Don't forget to fix upload name!"
+echo "Packaged .dmg available at ${BUILD_DIR}/${DMG_TARGET}, and uploaded to AWS"
