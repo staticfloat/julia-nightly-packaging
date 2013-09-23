@@ -14,7 +14,7 @@ DEBIAN_GIT_URL="https://github.com/staticfloat/julia-debian.git"
 JULIA_GIT_BRANCH=master
 DEBIAN_GIT_BRANCH=master
 BZR_BRANCH=trunk
-BUILD_DIR=/tmp/julia-packaging
+BUILD_DIR=$(echo ~)/tmp/julia-packaging
 
 cd $(dirname $0)
 ORIG_DIR=$(pwd)
@@ -59,7 +59,7 @@ if [ -z "$LAST_GOOD_COMMIT" ]; then
 fi
 
 git checkout -B ${JULIA_GIT_BRANCH} ${LAST_GOOD_COMMIT}
-if [[ "$?" != 0 ]]; then
+if [[ "$?" != "0" ]]; then
 	echo "Couldn't detect best last commit, going with HEAD!"
 	git checkout HEAD
 fi
@@ -75,10 +75,15 @@ make -C deps get-random
 # Work around our lack of git on buildd servers
 make -C base build_h.jl.phony
 cat base/build_h.jl | grep -v "const [^B]" > base/build_h.jl.nogit
+patch base/Makefile ${ORIG_DIR}/nogit-workaround.patch
+if [[ "$?" != "0" ]]; then
+	echo "ERROR: nogit-workaround.patch did not apply cleanly!" 1>&2
+	exit -1
+fi
 rm base/build_h.jl
 
 # Make it blaringly obvious to everyone that this is a git build when they start up Julia-
-DATECOMMIT=$(git log --pretty=format:'%cd' --date=short -n 1 | sed 's/-//g')
+DATECOMMIT=$(git log --pretty=format:'%cd' --date=short -n 1 | tr -d '-')
 echo "Syncing commit 0.2.0+nightly$DATECOMMIT."
 cd ..
 

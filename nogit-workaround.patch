@@ -1,0 +1,86 @@
+--- a/base/Makefile
++++ b/base/Makefile
+@@ -3,30 +3,7 @@
+ 
+ PCRE_CONST = 0x[0-9a-fA-F]+|[-+]?\s*[0-9]+
+ 
+-# These are all the values needed for the RawVersionInfo struct
+-version_string = $(shell cat ../VERSION)
+-commit = $(shell git rev-parse HEAD 2>/dev/null)
+-commit_short = $(shell git rev-parse --short HEAD 2>/dev/null)
+-build_number = $(shell echo $$(git describe --tags --long 2>/dev/null) | awk -F- '{ if( NF > 1 ) print $$(NF-1); else print 0; }')
+-git_tag = $(shell git describe --tags --abbrev=0 2>/dev/null)
+-prerelease = $(shell [ -z "$(git_tag)" -o "$(git_tag)" = "v$(version_string)" ] && echo false || echo true)
+-
+-git_branch = $(shell git branch 2>/dev/null | sed -n '/\* /s///p')
+-git_time = $(shell git log -1 --pretty=format:%ct 2>/dev/null)
+-ifneq ($(git_time), )
+-	ifneq (,$(filter $(OS), Darwin FreeBSD))
+-		date_string = "$(shell /bin/date -jr $(git_time) -u '+%Y-%m-%d %H:%M:%S %Z')"
+-	else
+-		date_string = "$(shell /bin/date --date=@$(git_time) -u '+%Y-%m-%d %H:%M:%S %Z')"
+-	endif
+-else
+-	date_string = ""
+-endif
+-dirty = $(shell [ -z "$(shell git status --porcelain 2>/dev/null)" ] && echo "false" || echo "true" )
+-
+-
+-
+-all: pcre_h.jl errno_h.jl build_h.jl.phony fenv_constants.jl file_constants.jl uv_constants.jl
++all: pcre_h.jl errno_h.jl build_h.jl file_constants.jl uv_constants.jl
+ 
+ pcre_h.jl:
+ 	@$(call PRINT_PERL, $(CPP) -dM $(shell $(PCRE_CONFIG) --prefix)/include/pcre.h | perl -nle '/^\s*#define\s+PCRE_(\w*)\s*\(?($(PCRE_CONST))\)?\s*$$/ and print "const $$1 = uint32($$2)"' | sort > $@)
+@@ -40,7 +17,7 @@
+ uv_constants.jl: ../src/uv_constants.h
+ 	@$(call PRINT_PERL, $(CPP) -P "-I$(LIBUV_INC)" -DJULIA ../src/uv_constants.h | tail -n 16 > $@)
+ 
+-build_h.jl.phony:
++build_h.jl:
+ 	@$(CC) -E -P build.h -I../src/support | grep . > $@
+ 	@echo "const ARCH = :$(ARCH)" >> $@
+ ifeq ($(OS),$(BUILD_OS))
+@@ -56,40 +33,9 @@
+ else
+ 	@echo "const USE_BLAS64 = false" >> $@
+ endif
++	@cat build_h.jl.nogit >> $@
+ 
+-	@echo "immutable BuildInfo" >> $@
+-	@echo "    version_string::ASCIIString" >> $@
+-	@echo "    commit::ASCIIString" >> $@
+-	@echo "    commit_short::ASCIIString" >> $@
+-	@echo "    branch::ASCIIString" >> $@
+-	@echo "    build_number::Int" >> $@
+-	@echo "    date_string::ASCIIString" >> $@
+-	@echo "    dirty::Bool" >> $@
+-	@echo "    prerelease::Bool" >> $@
+-	@echo "end" >> $@
+-
+-
+-	@echo "const BUILD_INFO = BuildInfo( \
+-			'\"$(version_string)\"', \
+-			'\"$(commit)\"', \
+-			'\"$(commit_short)\"', \
+-			'\"$(git_branch)\"', \
+-			$(build_number), \
+-			'\"$(date_string)\"', \
+-			$(dirty), \
+-			$(prerelease) \
+-			)" | xargs >> $@
+-
+-	@# This to ensure that we always rebuild this file, but only when it is modified do we touch build_h.jl,
+-	@# ensuring we rebuild the system image as infrequently as possible
+-	@if ! cmp -s $@ build_h.jl; then \
+-		$(call PRINT_PERL,) \
+-		mv $@ build_h.jl; \
+-	else \
+-		rm -f $@; \
+-	fi
+-
+-.PHONY: build_h.jl.phony
++.PHONY: build_h.jl
+ 
+ 
+ 
