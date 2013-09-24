@@ -28,7 +28,7 @@
 -
 -
 -all: pcre_h.jl errno_h.jl build_h.jl.phony fenv_constants.jl file_constants.jl uv_constants.jl
-+all: pcre_h.jl errno_h.jl build_h.jl file_constants.jl uv_constants.jl
++all: pcre_h.jl errno_h.jl build_h.jl fenv_constants.jl file_constants.jl uv_constants.jl
  
  pcre_h.jl:
  	@$(call PRINT_PERL, $(CPP) -dM $(shell $(PCRE_CONFIG) --prefix)/include/pcre.h | perl -nle '/^\s*#define\s+PCRE_(\w*)\s*\(?($(PCRE_CONST))\)?\s*$$/ and print "const $$1 = uint32($$2)"' | sort > $@)
