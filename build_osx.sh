@@ -46,7 +46,8 @@ rm -rf deps/libuv deps/Rmath # This is the most common failure mode
 git submodule update
 git reset --hard
 git checkout ${JULIA_GIT_BRANCH}
-git pull origin ${JULIA_GIT_BRANCH}
+git fetch
+git reset --hard origin/${JULIA_GIT_BRANCH}
 
 # Find the last commit that passed a Travis build
 LAST_GOOD_COMMIT=$(${ORIG_DIR}/get_last_good_commit.py)
