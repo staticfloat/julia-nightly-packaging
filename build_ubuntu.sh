@@ -14,7 +14,7 @@ DEBIAN_GIT_URL="https://github.com/staticfloat/julia-debian.git"
 JULIA_GIT_BRANCH=master
 DEBIAN_GIT_BRANCH=master
 BZR_BRANCH=trunk
-BUILD_DIR=$(echo ~)/tmp/julia-packaging
+BUILD_DIR=$(echo ~)/tmp/julia-packaging/ubuntu
 
 cd $(dirname $0)
 ORIG_DIR=$(pwd)

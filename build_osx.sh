@@ -17,7 +17,7 @@ fi
 
 # define variables
 JULIA_GIT_URL="https://github.com/JuliaLang/julia.git"
-BUILD_DIR=~/tmp/julia-packaging
+BUILD_DIR=$(echo ~)/tmp/julia-packaging/osx
 
 # This is the directory where my .julia directory is stored with cairo, tk, etc... all precompiled and ready
 export JULIA_PKGDIR=$(echo ~)/julia_packaging_home/
