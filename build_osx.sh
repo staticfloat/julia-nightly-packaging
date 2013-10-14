@@ -26,7 +26,7 @@ if [[ -d .git ]]; then
 fi
 
 # Do the gitwork to checkout the latest version of julia, clean everything up, etc...
-$ORIG_DIR/build_gitwork.sh
+source $ORIG_DIR/build_gitwork.sh
 
 # Build julia
 make cleanall
