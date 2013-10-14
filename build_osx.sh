@@ -10,15 +10,15 @@ set -x
 #  contents of the relevant .julia/ directory to the directory pointed to by $JULIA_PKGDIR below.
 
 
-export JULIA_GIT_BRANCH="master"
+JULIA_GIT_BRANCH="master"
 if [[ ! -z "$1" ]]; then
-    export JULIA_GIT_BRANCH="$1"
+    JULIA_GIT_BRANCH="$1"
 fi
 
 # define variables
-export BUILD_DIR=$(echo ~)/tmp/julia-packaging/osx
+BUILD_DIR=$(echo ~)/tmp/julia-packaging/osx
 cd $(dirname $0)
-export ORIG_DIR=$(pwd)
+ORIG_DIR=$(pwd)
 
 # Check if we've been downloaded as a git directory.  If so, update ourselves!
 if [[ -d .git ]]; then
