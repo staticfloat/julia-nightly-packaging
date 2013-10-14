@@ -10,14 +10,14 @@ set -x
 #   https://github.com/JuliaLang/julia/blob/master/README.windows.md
 # This script assumes both the 32 and 64-bit toolchains are installed to ~/cross-win{32,64}
 
-JULIA_GIT_BRANCH="master"
+export JULIA_GIT_BRANCH="master"
 if [[ ! -z "$1" ]]; then
-    JULIA_GIT_BRANCH="$1"
+    export JULIA_GIT_BRANCH="$1"
 fi
 
 # Find out where we live
 cd $(dirname $0)
-ORIG_DIR=$(pwd)
+export ORIG_DIR=$(pwd)
 
 # Check if we've been downloaded as a git directory.  If so, update ourselves!
 if [[ -d .git ]]; then
@@ -26,7 +26,7 @@ fi
 
 # We make 32 and 64-bit builds
 for ARCH in win32 win64; do
-	BUILD_DIR=$(echo ~)/tmp/julia-packaging/$ARCH
+	export BUILD_DIR=$(echo ~)/tmp/julia-packaging/$ARCH
 
 	# Do the gitwork to checkout the latest version of julia, clean everything up, etc...
 	$ORIG_DIR/build_gitwork.sh
