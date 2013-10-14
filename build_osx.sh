@@ -43,6 +43,7 @@ fi
 # Go into our checkout of JULIA_GIT_URL
 cd julia-${JULIA_GIT_BRANCH}
 rm -rf deps/libuv deps/Rmath # This is the most common failure mode
+rm -f bin/sys*.ji
 git submodule update
 git reset --hard
 git checkout ${JULIA_GIT_BRANCH}
