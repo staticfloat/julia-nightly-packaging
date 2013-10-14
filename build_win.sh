@@ -15,11 +15,7 @@ if [[ ! -z "$1" ]]; then
     JULIA_GIT_BRANCH="$1"
 fi
 
-# define variables
-JULIA_GIT_URL="https://github.com/JuliaLang/julia.git"
-BUILD_DIR=$(echo ~)/tmp/julia-packaging/
-
-# cd to the location of this script
+# Find out where we live
 cd $(dirname $0)
 ORIG_DIR=$(pwd)
 
@@ -30,36 +26,10 @@ fi
 
 # We make 32 and 64-bit builds
 for ARCH in win32 win64; do
-	mkdir -p $BUILD_DIR/$ARCH
-	cd $BUILD_DIR/$ARCH
+	BUILD_DIR=$(echo ~)/tmp/julia-packaging/$ARCH
 
-	# Checkout julia
-	if test ! -d julia-${JULIA_GIT_BRANCH}; then
-        	git clone ${JULIA_GIT_URL} julia-${JULIA_GIT_BRANCH}
-	fi
-
-	# Go into our checkout of JULIA_GIT_URL
-	cd julia-${JULIA_GIT_BRANCH}
-	rm -rf deps/libuv deps/Rmath # This is the most common failure mode
-	rm -f bin/sys*.ji
-	git submodule update
-	git reset --hard
-	git checkout ${JULIA_GIT_BRANCH}
-	git fetch
-	git reset --hard origin/${JULIA_GIT_BRANCH}
-
-	# Find the last commit that passed a Travis build
-	LAST_GOOD_COMMIT=$(${ORIG_DIR}/get_last_good_commit.py)
-	if [ -z "$LAST_GOOD_COMMIT" ]; then
-        	echo "ERROR: No good commits detected, going with HEAD!"
-	        LAST_GOOD_COMMIT="HEAD"
-	fi
-
-	git checkout -B ${JULIA_GIT_BRANCH} $LAST_GOOD_COMMIT
-	if [[ "$?" != 0 ]]; then
-        	echo "Couldn't checkout last good commit, going with master/HEAD!"
-        	git checkout master
-	fi
+	# Do the gitwork to checkout the latest version of julia, clean everything up, etc...
+	$ORIG_DIR/build_gitwork.sh
 
 	export PATH=$(echo ~)/cross-$ARCH/bin:$PATH
 	makevars="DEFAULT_REPL=basic"
@@ -70,5 +40,6 @@ for ARCH in win32 win64; do
 	fi
 
 	make $makevars
+	make $makevars win-extras
 	make $makevars dist
 done
