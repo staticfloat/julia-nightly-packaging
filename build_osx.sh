@@ -15,6 +15,10 @@ if [[ ! -z "$1" ]]; then
     JULIA_GIT_BRANCH="$1"
 fi
 
+if [[ "$2" == "sl" ]]; then
+	extra_makevars="DARWINVER=10"
+fi
+
 # define variables
 BUILD_DIR=$(echo ~)/tmp/julia-packaging/osx
 cd $(dirname $0)
@@ -30,21 +34,25 @@ source $ORIG_DIR/build_gitwork.sh
 
 # Build julia
 make cleanall
-make USE_SYSTEM_BLAS=1 USE_BLAS64=0 VERBOSE=1 testall
+make USE_SYSTEM_BLAS=1 USE_BLAS64=0 VERBOSE=1 $extra_makevars testall
 
 # Begin packaging steps
 cd contrib/mac/app
 
 # Make special packaging makefile
-make USE_SYSTEM_BLAS=1 USE_BLAS64=0
+make USE_SYSTEM_BLAS=1 USE_BLAS64=0 $extra_makevars
 
-DMG_TARGET="julia-0.2-unstable.dmg"
-
+DMG_TARGET="julia-0.2pre.dmg"
 if [[ "$JULIA_GIT_BRANCH" != "master" ]]; then
-    DMG_TARGET="julia-0.2-$(basename $JULIA_GIT_BRANCH)-unstable.dmg"
+    DMG_TARGET="julia-0.2pre-$(basename $JULIA_GIT_BRANCH).dmg"
 fi
 
-# We force its name to be julia-0.2-unstable.dmg
+# If we're building a snowleopard version
+if [[ "$2" == "sl" ]]; then
+	DMG_TARGET="${DMG_TARGET%.*}-10.6.dmg"
+fi
+
+# We force its name to be julia-0.2pre.dmg
 mv *.dmg "${BUILD_DIR}/$DMG_TARGET"
 
 # Upload .dmg file
