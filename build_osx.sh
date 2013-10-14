@@ -70,12 +70,6 @@ make USE_SYSTEM_BLAS=1 USE_BLAS64=0 VERBOSE=1 testall
 # Begin packaging steps
 cd contrib/mac/app
 
-# Check that Winston is installed
-if [ ! -d $JULIA_PKGDIR/Winston ]; then
-    echo "ERROR: Winston not installed to ${JULIA_PKGDIR}/; remedy this and try again!" 1>&2
-    exit -1
-fi
-
 # Make special packaging makefile
 make USE_SYSTEM_BLAS=1 USE_BLAS64=0
 
