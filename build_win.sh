@@ -34,12 +34,22 @@ for ARCH in win32 win64; do
 	export PATH=$(echo ~)/cross-$ARCH/bin:$PATH
 	makevars="DEFAULT_REPL=basic"
 	if [[ "$ARCH" == "win64" ]]; then
-		makevars="$makevars XC_HOST=x86_64-w64-mingw"
+		makevars="$makevars XC_HOST=x86_64-w64-mingw32"
 	else
 		makevars="$makevars XC_HOST=i686-w64-mingw32"
 	fi
 
+	# Ignore errors during these steps.  I don't really like this, as it makes it impossible to determine if the build failed, but oh well
+	set +e
 	make $makevars
+	set -e
+
 	make $makevars win-extras
+
+	# I did this to make sure that #4213 wasn't screwing up the build, but I had to delete test/unicode.jl from the list of tests to make it work
+	#make $makevars testall
 	make $makevars dist
+
+	# Upload the .exe!
+	echo "Bundled .exe is available at $(ls $(pwd)/julia-*.exe)"
 done
