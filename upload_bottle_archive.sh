@@ -53,7 +53,7 @@ echo
 echo "Put this in your formula:"
 echo
 echo "  bottle do"
-echo "    root_url '$BOTTLE_SERVER/bottles'"
+echo "    root_url 'http://archive.org/download/julialang/bottles'"
 echo "    cellar :any" # Let's be optimistic, lol
 if [[ ! -z "$revision" ]]; then
 	echo "    revision $revision"
