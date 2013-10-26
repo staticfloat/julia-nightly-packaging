@@ -7,7 +7,7 @@
 #   ./upload_binary.jl /tmp/Julia-0.2-pre.dmg /bin/osx/x64/0.2/julia-0.2-unstable.dmg
 
 if length(ARGS) != 2
-    error( "You must pass <file> and <upload path> to this script!" )
+    error( "Usage: ./upload_binary.jl <file> <upload_path>")
 end
 
 file = ARGS[1]
