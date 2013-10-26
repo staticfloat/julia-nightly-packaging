@@ -13,9 +13,17 @@ if [[ ! -z "$1" ]]; then
 fi
 
 BUILD_DIR=$(echo ~)/tmp/julia-packaging/osx
+SNOWLEOPARD=
 if [[ "$2" == "sl" ]]; then
-	extra_makevars="USE_SYSTEM_LIBUNWIND=1"
-	BUILD_DIR=$(echo ~)/tmp/julia-packaging/osx10.6
+    SNOWLEOPARD=1
+    extra_makevars="USE_SYSTEM_LIBUNWIND=1"
+    BUILD_DIR=$(echo ~)/tmp/julia-packaging/osx10.6
+    shift
+fi
+
+GIVEN_COMMIT=
+if [[ ! -z "$2" ]]; then
+    GIVEN_COMMIT="$2"
 fi
 
 # define variables
@@ -46,7 +54,7 @@ if [[ "$JULIA_GIT_BRANCH" != "master" ]]; then
 fi
 
 # If we're building a snowleopard version
-if [[ "$2" == "sl" ]]; then
+if [[ "$SNOWLEOPARD" == "1" ]]; then
 	DMG_TARGET="${DMG_TARGET%.*}-10.6.dmg"
 fi
 
@@ -54,6 +62,10 @@ fi
 mv *.dmg "${BUILD_DIR}/$DMG_TARGET"
 
 # Upload .dmg file
-${BUILD_DIR}/julia-${JULIA_GIT_BRANCH}/julia ${ORIG_DIR}/upload_binary.jl ${BUILD_DIR}/$DMG_TARGET /bin/osx/x64/0.2/$DMG_TARGET
+if [[ -z "$GIVEN_COMMIT" ]]; then
+    ${BUILD_DIR}/julia-${JULIA_GIT_BRANCH}/julia ${ORIG_DIR}/upload_binary.jl ${BUILD_DIR}/$DMG_TARGET /bin/osx/x64/0.2/$DMG_TARGET
 
-echo "Packaged .dmg available at ${BUILD_DIR}/${DMG_TARGET}, and uploaded to AWS"
+    echo "Packaged .dmg available at ${BUILD_DIR}/${DMG_TARGET}, and uploaded to AWS"
+else
+    echo "Packaged .dmg available at ${BUILD_DIR}/${DMG_TARGET}"
+fi

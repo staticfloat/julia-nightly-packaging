@@ -13,7 +13,7 @@ cd $BUILD_DIR
 
 # Checkout julia
 if [[ ! -d "julia-${JULIA_GIT_BRANCH}" ]]; then
-        git clone ${JULIA_GIT_URL} julia-${JULIA_GIT_BRANCH}
+    git clone ${JULIA_GIT_URL} julia-${JULIA_GIT_BRANCH}
 fi
 
 # Go into our checkout of JULIA_GIT_URL
@@ -28,15 +28,19 @@ git reset --hard origin/${JULIA_GIT_BRANCH}
 
 # Find the last commit that passed a Travis build
 set +e
-LAST_GOOD_COMMIT=$(${ORIG_DIR}/get_last_good_commit.py)
-if [ -z "$LAST_GOOD_COMMIT" ]; then
+if [[ -z "$GIVEN_COMMIT" ]]; then
+    LAST_GOOD_COMMIT=$(${ORIG_DIR}/get_last_good_commit.py)
+    if [ -z "$LAST_GOOD_COMMIT" ]; then
         echo "ERROR: No good commits detected, going with HEAD!"
         LAST_GOOD_COMMIT="HEAD"
+    fi
+else
+	LAST_GOOD_COMMIT="$GIVEN_COMMIT"
 fi
 
 git checkout -B ${JULIA_GIT_BRANCH} $LAST_GOOD_COMMIT
 if [[ "$?" != 0 ]]; then
-        echo "Couldn't checkout last good commit, going with master/HEAD!"
-        git checkout master
+    echo "Couldn't checkout last good commit, going with master/HEAD!"
+    git checkout master
 fi
 set -e
