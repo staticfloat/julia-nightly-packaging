@@ -1,4 +1,4 @@
-julia-nightlty-packaging
+julia-nightly-packaging
 =========
 
 Scripts to package up nightly builds of Julia.  Currently supports two platofrms; OSX and Ubuntu.
