@@ -52,4 +52,7 @@ for ARCH in win32 win64; do
 
 	# Upload the .exe!
 	echo "Bundled .exe is available at $(ls $(pwd)/julia-*.exe)"
+
+	# Report back to status.julialang.org!
+	${ORIG_DIR}/report_nightly.jl "$ARCH"
 done
