@@ -13,6 +13,7 @@ if [[ ! -z "$1" ]]; then
 fi
 
 BUILD_DIR=$(echo ~)/tmp/julia-packaging/osx
+BANNER="Official http://julialang.org release"
 SNOWLEOPARD=
 if [[ "$2" == "sl" ]]; then
     SNOWLEOPARD=1
@@ -40,13 +41,13 @@ source $ORIG_DIR/build_gitwork.sh
 
 # Build julia
 make cleanall
-make USE_SYSTEM_BLAS=1 USE_BLAS64=0 VERBOSE=1 $extra_makevars testall
+make USE_SYSTEM_BLAS=1 USE_BLAS64=0 VERBOSE=1 TAGGED_RELEASE_BANNER="$BANNER" $extra_makevars testall
 
 # Begin packaging steps
 cd contrib/mac/app
 
 # Make special packaging makefile
-make USE_SYSTEM_BLAS=1 USE_BLAS64=0 $extra_makevars
+make USE_SYSTEM_BLAS=1 USE_BLAS64=0 TAGGED_RELEASE_BANNER="$BANNER" $extra_makevars
 
 DMG_TARGET="julia-0.2pre.dmg"
 if [[ "$JULIA_GIT_BRANCH" != "master" ]]; then
@@ -68,4 +69,11 @@ if [[ -z "$GIVEN_COMMIT" ]]; then
     echo "Packaged .dmg available at ${BUILD_DIR}/${DMG_TARGET}, and uploaded to AWS"
 else
     echo "Packaged .dmg available at ${BUILD_DIR}/${DMG_TARGET}"
+fi
+
+# Report finished build!
+if [[ "$SNOWLEOPARD" == "1" ]]; then
+    ${ORIG_DIR}/report_nightly.jl "OSX 10.6"
+else
+    ${ORIG_DIR}/report_nightly.jl "OSX 10.7+"
 fi
