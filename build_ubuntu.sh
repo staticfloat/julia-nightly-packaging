@@ -104,4 +104,7 @@ bzr ci -m "Manual import commit ${DATECOMMIT} from ${JULIA_GIT_URL}/${JULIA_GIT_
 bzr push lp:${TEAM}/${PROJECT}/${BZR_BRANCH}
 cd ..
 
+# Report to status.julialang.org
+${ORIG_DIR}/report_nightly.jl "Ubuntu"
+
 exit 0
