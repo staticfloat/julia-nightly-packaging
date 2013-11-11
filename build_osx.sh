@@ -56,7 +56,7 @@ fi
 
 # If we're building a snowleopard version
 if [[ "$SNOWLEOPARD" == "1" ]]; then
-	DMG_TARGET="${DMG_TARGET%.*}-10.6.dmg"
+    DMG_TARGET="${DMG_TARGET%.*}-10.6.dmg"
 fi
 
 # We force its name to be julia-0.2pre.dmg
