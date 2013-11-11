@@ -49,13 +49,19 @@ fi
 
 # Go into our checkout of JULIA_GIT_URL
 cd julia-${JULIA_GIT_BRANCH}
-git pull origin ${JULIA_GIT_BRANCH}
+git checkout ${JULIA_GIT_BRANCH}
+git fetch
+git reset --hard origin/${JULIA_GIT_BRANCH}
 
 # Find the last commit that passed a Travis build
-LAST_GOOD_COMMIT=$(${ORIG_DIR}/get_last_good_commit.py)
-if [ -z "$LAST_GOOD_COMMIT" ]; then
-	echo "ERROR: No good commits detected!"
-	exit 1
+if [[ -z "$GIVEN_COMMIT" ]]; then
+    LAST_GOOD_COMMIT=$(${ORIG_DIR}/get_last_good_commit.py)
+    if [ -z "$LAST_GOOD_COMMIT" ]; then
+        echo "ERROR: No good commits detected, going with HEAD!"
+        LAST_GOOD_COMMIT="HEAD"
+    fi
+else
+    LAST_GOOD_COMMIT="$GIVEN_COMMIT"
 fi
 
 git checkout -B ${JULIA_GIT_BRANCH} ${LAST_GOOD_COMMIT}
@@ -63,9 +69,8 @@ if [[ "$?" != "0" ]]; then
 	echo "Couldn't detect best last commit, going with HEAD!"
 	git checkout HEAD
 fi
-git reset --hard
+
 # Make sure there's nothing laying around from forced pushes/rebases, etc...
-git clean -fdx
 git submodule init
 git submodule update
 

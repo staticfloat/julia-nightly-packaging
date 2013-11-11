@@ -35,7 +35,7 @@ if [[ -z "$GIVEN_COMMIT" ]]; then
         LAST_GOOD_COMMIT="HEAD"
     fi
 else
-	LAST_GOOD_COMMIT="$GIVEN_COMMIT"
+    LAST_GOOD_COMMIT="$GIVEN_COMMIT"
 fi
 
 git checkout -B ${JULIA_GIT_BRANCH} $LAST_GOOD_COMMIT
