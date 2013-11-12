@@ -54,5 +54,5 @@ for ARCH in win32 win64; do
 	echo "Bundled .exe is available at $(ls $(pwd)/julia-*.exe)"
 
 	# Report back to status.julialang.org!
-	${ORIG_DIR}/report_nightly.jl "$ARCH"
+	${ORIG_DIR}/report_nightly.jl "$ARCH" "http://s3.amazonaws.com/julialang/bin/winnt/x86/0.2/julia-0.2-pre-$ARCH.exe"
 done

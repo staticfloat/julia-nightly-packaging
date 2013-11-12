@@ -110,6 +110,6 @@ bzr push lp:${TEAM}/${PROJECT}/${BZR_BRANCH}
 cd ..
 
 # Report to status.julialang.org
-${ORIG_DIR}/report_nightly.jl "Ubuntu"
+${ORIG_DIR}/report_nightly.jl "Ubuntu" "https://launchpad.net/~staticfloat/+archive/julianightlies"
 
 exit 0
