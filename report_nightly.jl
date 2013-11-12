@@ -13,4 +13,4 @@ url = ARGS[2]
 json = "{\"target\": \"$target\", \"url\":\"$url\"}"
 ro = RequestOptions( content_type = "application/json" )
 
-post("http://julia-codespeed.csail.mit.edu:8000/put/nightly", json ) 
+post("http://status.julialang.org/put/nightly", json ) 
