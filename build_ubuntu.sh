@@ -70,7 +70,6 @@ if [[ "$?" != "0" ]]; then
 	git checkout HEAD
 fi
 
-# Make sure there's nothing laying around from forced pushes/rebases, etc...
 git submodule init
 git submodule update
 
