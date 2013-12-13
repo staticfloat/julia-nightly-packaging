@@ -49,9 +49,9 @@ cd contrib/mac/app
 # Make special packaging makefile
 make USE_SYSTEM_BLAS=1 USE_BLAS64=0 TAGGED_RELEASE_BANNER="$BANNER" $extra_makevars
 
-DMG_TARGET="julia-0.2pre.dmg"
+DMG_TARGET="julia-0.3pre.dmg"
 if [[ "$JULIA_GIT_BRANCH" != "master" ]]; then
-    DMG_TARGET="julia-0.2pre-$(basename $JULIA_GIT_BRANCH).dmg"
+    DMG_TARGET="julia-0.3pre-$(basename $JULIA_GIT_BRANCH).dmg"
 fi
 
 # If we're building a snowleopard version
@@ -59,12 +59,12 @@ if [[ "$SNOWLEOPARD" == "1" ]]; then
     DMG_TARGET="${DMG_TARGET%.*}-10.6.dmg"
 fi
 
-# We force its name to be julia-0.2pre.dmg
+# We force its name to be julia-0.3pre.dmg
 mv *.dmg "${BUILD_DIR}/$DMG_TARGET"
 
 # Upload .dmg file
 if [[ -z "$GIVEN_COMMIT" ]]; then
-    ${BUILD_DIR}/julia-${JULIA_GIT_BRANCH}/julia ${ORIG_DIR}/upload_binary.jl ${BUILD_DIR}/$DMG_TARGET /bin/osx/x64/0.2/$DMG_TARGET
+    ${BUILD_DIR}/julia-${JULIA_GIT_BRANCH}/julia ${ORIG_DIR}/upload_binary.jl ${BUILD_DIR}/$DMG_TARGET /bin/osx/x64/0.3/$DMG_TARGET
 
     echo "Packaged .dmg available at ${BUILD_DIR}/${DMG_TARGET}, and uploaded to AWS"
 else
@@ -73,7 +73,7 @@ fi
 
 # Report finished build!
 if [[ "$SNOWLEOPARD" == "1" ]]; then
-    ${ORIG_DIR}/report_nightly.jl "OSX 10.6" "https://s3.amazonaws.com/julialang/bin/osx/x64/0.2/julia-0.2-pre-10.6.dmg"
+    ${ORIG_DIR}/report_nightly.jl "OSX 10.6" "https://s3.amazonaws.com/julialang/bin/osx/x64/0.3/julia-0.3-pre-10.6.dmg"
 else
-    ${ORIG_DIR}/report_nightly.jl "OSX 10.7+" "https://s3.amazonaws.com/julialang/bin/osx/x64/0.2/julia-0.2-pre.dmg"
+    ${ORIG_DIR}/report_nightly.jl "OSX 10.7+" "https://s3.amazonaws.com/julialang/bin/osx/x64/0.3/julia-0.3-pre.dmg"
 fi
