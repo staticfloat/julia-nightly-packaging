@@ -76,6 +76,9 @@ git submodule update
 # Hack to get around our lack of packaging of Rmath
 make -C deps get-random
 
+# same for utf8proc
+make -C deps get-utf8proc
+
 # Work around our lack of git on buildd servers
 make -C base build_h.jl.phony
 cat base/build_h.jl | grep -v "const [^B]" > base/build_h.jl.nogit
