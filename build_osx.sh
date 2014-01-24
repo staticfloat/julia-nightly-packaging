@@ -38,6 +38,7 @@ fi
 
 # Do the gitwork to checkout the latest version of julia, clean everything up, etc...
 source $ORIG_DIR/build_gitwork.sh
+JULIA_VERSION=$(cat VERSION)
 
 # Build julia
 make cleanall
@@ -49,9 +50,9 @@ cd contrib/mac/app
 # Make special packaging makefile
 make USE_SYSTEM_BLAS=1 USE_BLAS64=0 TAGGED_RELEASE_BANNER="$BANNER" $extra_makevars
 
-DMG_TARGET="julia-0.3pre.dmg"
+DMG_TARGET="julia-${JULIA_VERSION}.dmg"
 if [[ "$JULIA_GIT_BRANCH" != "master" ]]; then
-    DMG_TARGET="julia-0.3pre-$(basename $JULIA_GIT_BRANCH).dmg"
+    DMG_TARGET="julia-${JULIA_VERSION}-$(basename $JULIA_GIT_BRANCH).dmg"
 fi
 
 # If we're building a snowleopard version

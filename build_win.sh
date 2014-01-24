@@ -30,6 +30,7 @@ for ARCH in win32 win64; do
 
 	# Do the gitwork to checkout the latest version of julia, clean everything up, etc...
 	source $ORIG_DIR/build_gitwork.sh
+	JULIA_VERSION=$(cat VERSION)
 
 	export PATH=$(echo ~)/cross-$ARCH/bin:$PATH
 	makevars="DEFAULT_REPL=basic"
@@ -50,9 +51,13 @@ for ARCH in win32 win64; do
 	#make $makevars testall
 	make $makevars dist
 
-	# Upload the .exe!
-	echo "Bundled .exe is available at $(ls $(pwd)/julia-*.exe)"
-
-	# Report back to status.julialang.org!
-	${ORIG_DIR}/report_nightly.jl "$ARCH" "http://s3.amazonaws.com/julialang/bin/winnt/x86/0.2/julia-0.2-pre-$ARCH.exe"
+	# Upload the .exe and report to status.julialang.org:
+	echo "Bundled .exe is available at $(ls ${BUILD_DIR}/julia-*.exe)"
+	if [[ "$ARCH" == "win32" ]]; then
+		PROC_ARCH="x86"
+	else
+		PROC_ARCH="x64"
+	fi
+	julia ${ORIG_DIR}/upload_binary.jl ${BUILD_DIR}/julia-*.exe "/bin/winnt/${PROC_ARCH}/0.3/julia-${JULIA_VERSION}-${ARCH}.exe"
+	${ORIG_DIR}/report_nightly.jl "$ARCH" "http://s3.amazonaws.com/julialang/bin/winnt/${PROC_ARCH}/0.3/julia-${JULIA_VERSION}-${ARCH}.exe"
 done
