@@ -73,7 +73,7 @@ fi
 
 # Report finished build!
 if [[ "$SNOWLEOPARD" == "1" ]]; then
-    ${ORIG_DIR}/report_nightly.jl "OSX 10.6" "https://s3.amazonaws.com/julialang/bin/osx/x64/0.3/julia-0.3-pre-10.6.dmg"
+    ${ORIG_DIR}/report_nightly.jl "OSX 10.6" "https://s3.amazonaws.com/julialang/bin/osx/x64/0.3/julia-${JULIA_VERSION}-10.6.dmg"
 else
-    ${ORIG_DIR}/report_nightly.jl "OSX 10.7+" "https://s3.amazonaws.com/julialang/bin/osx/x64/0.3/julia-0.3-pre.dmg"
+    ${ORIG_DIR}/report_nightly.jl "OSX 10.7+" "https://s3.amazonaws.com/julialang/bin/osx/x64/0.3/julia-${JULIA_VERSION}.dmg"
 fi
