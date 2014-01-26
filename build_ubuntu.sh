@@ -80,14 +80,7 @@ make -C deps get-random
 make -C deps get-utf8proc
 
 # Work around our lack of git on buildd servers
-make -C base build_h.jl.phony
-cat base/build_h.jl | grep -v "const [^B]" > base/build_h.jl.nogit
-patch base/Makefile ${ORIG_DIR}/nogit-workaround.patch
-if [[ "$?" != "0" ]]; then
-	echo "ERROR: nogit-workaround.patch did not apply cleanly!" 1>&2
-	exit -1
-fi
-rm base/build_h.jl
+make -C base version_git.jl.phony
 
 # Make it blaringly obvious to everyone that this is a git build when they start up Julia-
 DATECOMMIT=$(git log --pretty=format:'%cd' --date=short -n 1 | tr -d '-')
