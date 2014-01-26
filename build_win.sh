@@ -52,12 +52,12 @@ for ARCH in win32 win64; do
 	make $makevars dist
 
 	# Upload the .exe and report to status.julialang.org:
-	echo "Bundled .exe is available at $(ls ${BUILD_DIR}/julia-*.exe)"
+	echo "Bundled .exe is available at $(ls ${BUILD_DIR}/julia-${JULIA_GIT_BRANCH}/julia-*.exe)"
 	if [[ "$ARCH" == "win32" ]]; then
 		PROC_ARCH="x86"
 	else
 		PROC_ARCH="x64"
 	fi
-	julia ${ORIG_DIR}/upload_binary.jl ${BUILD_DIR}/julia-*.exe "/bin/winnt/${PROC_ARCH}/0.3/julia-${JULIA_VERSION}-${ARCH}.exe"
+	julia ${ORIG_DIR}/upload_binary.jl ${BUILD_DIR}/julia-${JULIA_GIT_BRANCH}/julia-*.exe "/bin/winnt/${PROC_ARCH}/0.3/julia-${JULIA_VERSION}-${ARCH}.exe"
 	${ORIG_DIR}/report_nightly.jl "$ARCH" "http://s3.amazonaws.com/julialang/bin/winnt/${PROC_ARCH}/0.3/julia-${JULIA_VERSION}-${ARCH}.exe"
 done
