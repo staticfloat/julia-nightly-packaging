@@ -39,6 +39,7 @@ fi
 # Do the gitwork to checkout the latest version of julia, clean everything up, etc...
 source $ORIG_DIR/build_gitwork.sh
 JULIA_VERSION=$(cat VERSION)
+VERSDIR=$(cut -d. -f1-2 < VERSION)
 
 # Build julia
 make cleanall
@@ -60,12 +61,12 @@ if [[ "$SNOWLEOPARD" == "1" ]]; then
     DMG_TARGET="${DMG_TARGET%.*}-10.6.dmg"
 fi
 
-# We force its name to be julia-0.3pre.dmg
+# We force its name to be constant
 mv *.dmg "${BUILD_DIR}/$DMG_TARGET"
 
 # Upload .dmg file
 if [[ -z "$GIVEN_COMMIT" ]]; then
-    ${BUILD_DIR}/julia-${JULIA_GIT_BRANCH}/julia ${ORIG_DIR}/upload_binary.jl ${BUILD_DIR}/$DMG_TARGET /bin/osx/x64/0.3/$DMG_TARGET
+    ${BUILD_DIR}/julia-${JULIA_GIT_BRANCH}/julia ${ORIG_DIR}/upload_binary.jl ${BUILD_DIR}/$DMG_TARGET /bin/osx/x64/${VERSDIR}/$DMG_TARGET
 
     echo "Packaged .dmg available at ${BUILD_DIR}/${DMG_TARGET}, and uploaded to AWS"
 else
@@ -74,7 +75,7 @@ fi
 
 # Report finished build!
 if [[ "$SNOWLEOPARD" == "1" ]]; then
-    ${ORIG_DIR}/report_nightly.jl "OSX 10.6" "https://s3.amazonaws.com/julialang/bin/osx/x64/0.3/julia-${JULIA_VERSION}-10.6.dmg"
+    ${ORIG_DIR}/report_nightly.jl "OSX 10.6" "https://s3.amazonaws.com/julialang/bin/osx/x64/${VERSDIR}/julia-${JULIA_VERSION}-10.6.dmg"
 else
-    ${ORIG_DIR}/report_nightly.jl "OSX 10.7+" "https://s3.amazonaws.com/julialang/bin/osx/x64/0.3/julia-${JULIA_VERSION}.dmg"
+    ${ORIG_DIR}/report_nightly.jl "OSX 10.7+" "https://s3.amazonaws.com/julialang/bin/osx/x64/${VERSDIR}/julia-${JULIA_VERSION}.dmg"
 fi
