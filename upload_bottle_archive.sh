@@ -44,7 +44,7 @@ function upload()
 }
 
 # create files for all architectures
-for platform in mountain_lion lion snow_leopard mavericks; do
+for platform in mountain_lion lion snow_leopard mavericks snow_leopard_or_later; do
 	echo "Uploading ${name}-${version}.$platform.$suffix..."
 	upload "$1" "$BOTTLE_SERVER/bottles/${name}-${version}.$platform.$suffix"
 done
@@ -60,8 +60,5 @@ if [[ ! -z "$revision" ]]; then
 fi
 
 sha=$(shasum $1 | cut -d" " -f1)
-for platform in mountain_lion lion snow_leopard mavericks; do
-	echo "    sha1 '$sha' => :$platform"
-done
-
+echo "    sha1 '$sha' => :snow_leopard_or_later"
 echo "  end"
