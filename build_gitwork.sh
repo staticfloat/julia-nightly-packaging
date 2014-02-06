@@ -49,4 +49,4 @@ set -e
 JULIA_VERSION=$(cat VERSION)
 VERSDIR=$(cut -d. -f1-2 < VERSION)
 BANNER="Official http://julialang.org/ release"
-makevars="VERBOSE=1 TAGGED_RELEASE_BANNER=$BANNER"
+makevars="VERBOSE=1 TAGGED_RELEASE_BANNER=\"$BANNER\""
