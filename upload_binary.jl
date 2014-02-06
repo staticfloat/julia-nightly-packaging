@@ -6,7 +6,7 @@
 # Example:
 #   ./upload_binary.jl /tmp/Julia-0.2-pre.dmg /bin/osx/x64/0.2/julia-0.2-unstable.dmg
 
-if length(ARGS) != 2
+if length(ARGS) != 3
     error( "Usage: ./upload_binary.jl <file> <log file> <upload_path>")
 end
 
