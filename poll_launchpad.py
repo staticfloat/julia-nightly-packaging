@@ -11,4 +11,4 @@ archive = lp.people['staticfloat'].getPPAByName(name = "julianightlies")
 binaries = archive.getPublishedBinaries(status='Published')
 timestr = min([z['date_published'] for z in binaries.entries])
 
-requests.post("http://status.julialang.org/put/nightly", data=json.dumps({'target':'Ubuntu', 'time':timestr, 'url':url}))
+requests.post("http://status.julialang.org/put/nightly", data=json.dumps({'target':'Ubuntu', 'time':timestr, 'url':url, 'log_url':url}))
