@@ -15,7 +15,9 @@ fi
 if [[ -z "$LOG_FILE" ]]; then
 	LOG_FILE="$BUILD_DIR/autonamed.log"
 fi
-exec >$LOG_FILE 2>&1
+rm -f "$LOG_FILE"
+exec > >(tee -a "$LOG_FILE")
+exec 2> >(tee -a "$LOG_FILE" >&2)
 
 JULIA_GIT_URL="https://github.com/JuliaLang/julia.git"
 mkdir -p $BUILD_DIR
