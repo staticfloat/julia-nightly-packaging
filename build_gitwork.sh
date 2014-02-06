@@ -18,6 +18,8 @@ fi
 rm -f "$LOG_FILE"
 exec > >(tee -a "$LOG_FILE")
 exec 2> >(tee -a "$LOG_FILE" >&2)
+set -x
+set -e
 
 JULIA_GIT_URL="https://github.com/JuliaLang/julia.git"
 mkdir -p $BUILD_DIR
