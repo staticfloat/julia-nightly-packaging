@@ -25,6 +25,7 @@ fi
 # We build for 10.7+ and 10.6
 for OS in "10.7+" "10.6"; do
     BUILD_DIR=$(echo ~)/tmp/julia-packaging/osx${OS}
+    LOG_FILE=$BUILD_DIR/$OS.log
 
     # Do the gitwork to checkout the latest version of julia, clean everything up, etc...
     source $ORIG_DIR/build_gitwork.sh
@@ -52,7 +53,7 @@ for OS in "10.7+" "10.6"; do
 
     # Upload .dmg file if we're not building a given commit
     if [[ -z "$GIVEN_COMMIT" ]]; then
-        ${BUILD_DIR}/julia-${JULIA_GIT_BRANCH}/julia ${ORIG_DIR}/upload_binary.jl ${BUILD_DIR}/julia-${JULIA_GIT_BRANCH}/*.dmg /bin/osx/x64/${VERSDIR}/$DMG_TARGET
+        ${BUILD_DIR}/julia-${JULIA_GIT_BRANCH}/julia ${ORIG_DIR}/upload_binary.jl ${BUILD_DIR}/julia-${JULIA_GIT_BRANCH}/*.dmg $LOG_FILE /bin/osx/x64/${VERSDIR}/$DMG_TARGET
         echo "Packaged .dmg available at $(ls ${BUILD_DIR}/julia-${JULIA_GIT_BRANCH}/*.dmg), and uploaded to AWS"
     else
         echo "Packaged .dmg available at $(ls ${BUILD_DIR}/julia-${JULIA_GIT_BRANCH}/*.dmg)"

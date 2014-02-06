@@ -25,7 +25,7 @@ fi
 # We make 32 and 64-bit builds
 for ARCH in win32 win64; do
 	BUILD_DIR=$(echo ~)/tmp/julia-packaging/$ARCH
-	LOG_FILE=$(BUILD_DIR)/$ARCH.log
+	LOG_FILE=$BUILD_DIR/$ARCH.log
 
 	# Do the gitwork to checkout the latest version of julia, clean everything up, etc...
 	source $ORIG_DIR/build_gitwork.sh
@@ -58,7 +58,7 @@ for ARCH in win32 win64; do
 	else
 		PROC_ARCH="x64"
 	fi
-	julia ${ORIG_DIR}/upload_binary.jl ${BUILD_DIR}/julia-${JULIA_GIT_BRANCH}/julia-*.exe "/bin/winnt/${PROC_ARCH}/${VERSDIR}/${EXE_TARGET}"
+	julia ${ORIG_DIR}/upload_binary.jl ${BUILD_DIR}/julia-${JULIA_GIT_BRANCH}/julia-*.exe $LOG_FILE "/bin/winnt/${PROC_ARCH}/${VERSDIR}/${EXE_TARGET}"
 
 	AWS_URL="http://s3.amazonaws.com/julialang/bin/winnt/${PROC_ARCH}/${VERSDIR}/julia-${JULIA_VERSION}-${ARCH}.exe"
 	${ORIG_DIR}/report_nightly.jl $ARCH $AWS_URL ${AWS_URL}.log

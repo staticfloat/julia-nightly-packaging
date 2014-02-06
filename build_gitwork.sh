@@ -9,11 +9,11 @@
 
 # Ensure we can enable logging and have a good builddir
 if [[ -z "$BUILD_DIR" ]]; then
-	BUILD_DIR=$(echo ~)/tmp/julia-packaging/$(uname -s)
+	BUILD_DIR="$(echo ~)/tmp/julia-packaging/$(uname -s)"
 fi
 
 if [[ -z "$LOG_FILE" ]]; then
-	LOG_FILE=$(BUILD_DIR)/autonamed.log
+	LOG_FILE="$BUILD_DIR/autonamed.log"
 fi
 exec >$LOG_FILE 2>&1
 
