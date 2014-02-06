@@ -30,7 +30,6 @@ for ARCH in win32 win64; do
 
 	# Do the gitwork to checkout the latest version of julia, clean everything up, etc...
 	source $ORIG_DIR/build_gitwork.sh
-	JULIA_VERSION=$(cat VERSION)
 
 	export PATH=$(echo ~)/cross-$ARCH/bin:$PATH
 	makevars="DEFAULT_REPL=basic"
