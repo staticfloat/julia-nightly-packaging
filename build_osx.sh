@@ -1,10 +1,12 @@
 #!/bin/bash
-set -e
-set -x
 
 # This script invoked by a cron job every X hours
 # This script functions best when the following are installed:
 #   git, python (with the "requests" module installed, for Travis-CI API), playtpus (must be in path)
+
+
+# This script builds both the 10.7+ compatible binary as well as the 10.6-compatible binary
+
 
 JULIA_GIT_BRANCH="master"
 if [[ ! -z "$1" ]]; then
@@ -17,7 +19,7 @@ ORIG_DIR=$(pwd)
 
 # Check if we've been downloaded as a git directory.  If so, update ourselves!
 if [[ -d .git ]]; then
-    git pull
+    git pull -q
 fi
 
 # We build for 10.7+ and 10.6
@@ -26,7 +28,6 @@ for OS in "10.7+" "10.6"; do
 
     # Do the gitwork to checkout the latest version of julia, clean everything up, etc...
     source $ORIG_DIR/build_gitwork.sh
-    JULIA_VERSION=$(cat VERSION)
 
     # On OSX, we use Accelerate instead of OpenBLAS for now
     makevars+=( USE_SYSTEM_BLAS=1 USE_BLAS64=0 )
@@ -47,20 +48,17 @@ for OS in "10.7+" "10.6"; do
     DMG_TARGET="julia-${JULIA_VERSION}-${OS}.dmg"
     if [[ "$JULIA_GIT_BRANCH" != "master" ]]; then
         DMG_TARGET="julia-${JULIA_VERSION}-$(basename $JULIA_GIT_BRANCH)-${OS}.dmg"
-    fi    
-
-    # We force its name to be constant, rather than having gitsha's in the filename
-    mv *.dmg "${BUILD_DIR}/$DMG_TARGET"
+    fi
 
     # Upload .dmg file if we're not building a given commit
     if [[ -z "$GIVEN_COMMIT" ]]; then
-        ${BUILD_DIR}/julia-${JULIA_GIT_BRANCH}/julia ${ORIG_DIR}/upload_binary.jl ${BUILD_DIR}/$DMG_TARGET /bin/osx/x64/${VERSDIR}/$DMG_TARGET
-        echo "Packaged .dmg available at ${BUILD_DIR}/${DMG_TARGET}, and uploaded to AWS"
+        ${BUILD_DIR}/julia-${JULIA_GIT_BRANCH}/julia ${ORIG_DIR}/upload_binary.jl ${BUILD_DIR}/julia-${JULIA_GIT_BRANCH}/*.dmg /bin/osx/x64/${VERSDIR}/$DMG_TARGET
+        echo "Packaged .dmg available at $(ls ${BUILD_DIR}/julia-${JULIA_GIT_BRANCH}/*.dmg), and uploaded to AWS"
     else
-        echo "Packaged .dmg available at ${BUILD_DIR}/${DMG_TARGET}"
+        echo "Packaged .dmg available at $(ls ${BUILD_DIR}/julia-${JULIA_GIT_BRANCH}/*.dmg)"
     fi
 
     # Report finished build!
     AWS_URL="https://s3.amazonaws.com/julialang/bin/osx/x64/${VERSDIR}/$DMG_TARGET"
-    ${ORIG_DIR}/report_nightly.jl "OSX ${OS}" $AWS_URL "$AWS_URL.log"
+    ${ORIG_DIR}/report_nightly.jl "OSX ${OS}" $AWS_URL ${AWS_URL}.log
 done
