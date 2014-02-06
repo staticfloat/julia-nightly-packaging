@@ -58,7 +58,7 @@ for ARCH in win32 win64; do
 	else
 		PROC_ARCH="x64"
 	fi
-	julia ${ORIG_DIR}/upload_binary.jl ${BUILD_DIR}/julia-${JULIA_GIT_BRANCH}/julia-*.exe $LOG_FILE "/bin/winnt/${PROC_ARCH}/${VERSDIR}/${EXE_TARGET}"
+	${ORIG_DIR}/upload_binary.jl ${BUILD_DIR}/julia-${JULIA_GIT_BRANCH}/julia-*.exe $LOG_FILE "/bin/winnt/${PROC_ARCH}/${VERSDIR}/${EXE_TARGET}"
 
 	AWS_URL="http://s3.amazonaws.com/julialang/bin/winnt/${PROC_ARCH}/${VERSDIR}/julia-${JULIA_VERSION}-${ARCH}.exe"
 	${ORIG_DIR}/report_nightly.jl $ARCH $AWS_URL ${AWS_URL}.log

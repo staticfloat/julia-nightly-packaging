@@ -52,11 +52,12 @@ for OS in "10.7+" "10.6"; do
     fi
 
     # Upload .dmg file if we're not building a given commit
+    DMG_SRC=$(ls ${BUILD_DIR}/julia-${JULIA_GIT_BRANCH}/*.dmg)
     if [[ -z "$GIVEN_COMMIT" ]]; then
-        ${BUILD_DIR}/julia-${JULIA_GIT_BRANCH}/julia ${ORIG_DIR}/upload_binary.jl ${BUILD_DIR}/julia-${JULIA_GIT_BRANCH}/*.dmg $LOG_FILE /bin/osx/x64/${VERSDIR}/$DMG_TARGET
-        echo "Packaged .dmg available at $(ls ${BUILD_DIR}/julia-${JULIA_GIT_BRANCH}/*.dmg), and uploaded to AWS"
+        ${ORIG_DIR}/upload_binary.jl $DMG_SRC $LOG_FILE /bin/osx/x64/${VERSDIR}/$DMG_TARGET
+        echo "Packaged .dmg available at $DMG_SRC, and uploaded to AWS"
     else
-        echo "Packaged .dmg available at $(ls ${BUILD_DIR}/julia-${JULIA_GIT_BRANCH}/*.dmg)"
+        echo "Packaged .dmg available at $DMG_SRC"
     fi
 
     # Report finished build!
