@@ -7,6 +7,20 @@
 # It needs the following environment variables set in order to work:
 #  ORIG_DIR, BUILD_DIR, JULIA_GIT_BRANCH
 
+# Ensure we can enable logging and have a good builddir
+if [[ -z "$BUILD_DIR" ]]; then
+	BUILD_DIR="$(echo ~)/tmp/julia-packaging/$(uname -s)"
+fi
+
+if [[ -z "$LOG_FILE" ]]; then
+	LOG_FILE="$BUILD_DIR/autonamed.log"
+fi
+rm -f "$LOG_FILE"
+exec > >(tee -a "$LOG_FILE")
+exec 2> >(tee -a "$LOG_FILE" >&2)
+set -x
+set -e
+
 JULIA_GIT_URL="https://github.com/JuliaLang/julia.git"
 mkdir -p $BUILD_DIR
 cd $BUILD_DIR
@@ -44,3 +58,9 @@ if [[ "$?" != 0 ]]; then
     git checkout master
 fi
 set -e
+
+# Set commonly used variables
+JULIA_VERSION=$(cat VERSION)
+VERSDIR=$(cut -d. -f1-2 < VERSION)
+BANNER="Official http://julialang.org/ release"
+makevars=( VERBOSE=1 TAGGED_RELEASE_BANNER="$BANNER" )

@@ -1,10 +1,11 @@
 #!/bin/bash
-set -e
-set -x
 
 # This script invoked by a cron job every X hours
 # This script functions best when the following are installed:
 #   git, python (with the "requests" module installed, for Travis-CI API), playtpus (must be in path)
+
+
+# This script builds both the 10.7+ compatible binary as well as the 10.6-compatible binary
 
 
 JULIA_GIT_BRANCH="master"
@@ -12,70 +13,54 @@ if [[ ! -z "$1" ]]; then
     JULIA_GIT_BRANCH="$1"
 fi
 
-BUILD_DIR=$(echo ~)/tmp/julia-packaging/osx
-BANNER="Official http://julialang.org release"
-SNOWLEOPARD=
-if [[ "$2" == "sl" ]]; then
-    SNOWLEOPARD=1
-    extra_makevars="USE_SYSTEM_LIBUNWIND=1"
-    BUILD_DIR=$(echo ~)/tmp/julia-packaging/osx10.6
-    shift
-fi
-
-GIVEN_COMMIT=
-if [[ ! -z "$2" ]]; then
-    GIVEN_COMMIT="$2"
-fi
-
-# define variables
+# Find out where we live
 cd $(dirname $0)
 ORIG_DIR=$(pwd)
 
 # Check if we've been downloaded as a git directory.  If so, update ourselves!
 if [[ -d .git ]]; then
-        git pull
+    git pull -q
 fi
 
-# Do the gitwork to checkout the latest version of julia, clean everything up, etc...
-source $ORIG_DIR/build_gitwork.sh
-JULIA_VERSION=$(cat VERSION)
-VERSDIR=$(cut -d. -f1-2 < VERSION)
+# We build for 10.7+ and 10.6
+for OS in "10.7+" "10.6"; do
+    BUILD_DIR=$(echo ~)/tmp/julia-packaging/osx${OS}
+    LOG_FILE=$BUILD_DIR/$OS.log
 
-# Build julia
-make cleanall
-make USE_SYSTEM_BLAS=1 USE_BLAS64=0 VERBOSE=1 TAGGED_RELEASE_BANNER="$BANNER" $extra_makevars testall
+    # Do the gitwork to checkout the latest version of julia, clean everything up, etc...
+    source $ORIG_DIR/build_gitwork.sh
 
-# Begin packaging steps
-cd contrib/mac/app
+    # On OSX, we use Accelerate instead of OpenBLAS for now
+    makevars+=( USE_SYSTEM_BLAS=1 USE_BLAS64=0 )
 
-# Make special packaging makefile
-make USE_SYSTEM_BLAS=1 USE_BLAS64=0 TAGGED_RELEASE_BANNER="$BANNER" $extra_makevars
+    # If we're compiling for snow leopard, make sure we use system libunwind
+    if [[ "$OS" == "10.6" ]]; then
+        makevars+=( USE_SYSTEM_LIBUNWIND=1 )
+    fi
 
-DMG_TARGET="julia-${JULIA_VERSION}.dmg"
-if [[ "$JULIA_GIT_BRANCH" != "master" ]]; then
-    DMG_TARGET="julia-${JULIA_VERSION}-$(basename $JULIA_GIT_BRANCH).dmg"
-fi
+    # Build and test
+    make "${makevars[@]}"
+    make "${makevars[@]}" testall
 
-# If we're building a snowleopard version
-if [[ "$SNOWLEOPARD" == "1" ]]; then
-    DMG_TARGET="${DMG_TARGET%.*}-10.6.dmg"
-fi
+    # Make special packaging makefile
+    cd contrib/mac/app
+    make $makevars
 
-# We force its name to be constant
-mv *.dmg "${BUILD_DIR}/$DMG_TARGET"
+    DMG_TARGET="julia-${JULIA_VERSION}-${OS}.dmg"
+    if [[ "$JULIA_GIT_BRANCH" != "master" ]]; then
+        DMG_TARGET="julia-${JULIA_VERSION}-$(basename $JULIA_GIT_BRANCH)-${OS}.dmg"
+    fi
 
-# Upload .dmg file
-if [[ -z "$GIVEN_COMMIT" ]]; then
-    ${BUILD_DIR}/julia-${JULIA_GIT_BRANCH}/julia ${ORIG_DIR}/upload_binary.jl ${BUILD_DIR}/$DMG_TARGET /bin/osx/x64/${VERSDIR}/$DMG_TARGET
+    # Upload .dmg file if we're not building a given commit
+    DMG_SRC=$(ls ${BUILD_DIR}/julia-${JULIA_GIT_BRANCH}/contrib/mac/app/*.dmg)
+    if [[ -z "$GIVEN_COMMIT" ]]; then
+        ${ORIG_DIR}/upload_binary.jl $DMG_SRC $LOG_FILE /bin/osx/x64/${VERSDIR}/$DMG_TARGET
+        echo "Packaged .dmg available at $DMG_SRC, and uploaded to AWS"
+    else
+        echo "Packaged .dmg available at $DMG_SRC"
+    fi
 
-    echo "Packaged .dmg available at ${BUILD_DIR}/${DMG_TARGET}, and uploaded to AWS"
-else
-    echo "Packaged .dmg available at ${BUILD_DIR}/${DMG_TARGET}"
-fi
-
-# Report finished build!
-if [[ "$SNOWLEOPARD" == "1" ]]; then
-    ${ORIG_DIR}/report_nightly.jl "OSX 10.6" "https://s3.amazonaws.com/julialang/bin/osx/x64/${VERSDIR}/julia-${JULIA_VERSION}-10.6.dmg"
-else
-    ${ORIG_DIR}/report_nightly.jl "OSX 10.7+" "https://s3.amazonaws.com/julialang/bin/osx/x64/${VERSDIR}/julia-${JULIA_VERSION}.dmg"
-fi
+    # Report finished build!
+    AWS_URL="https://s3.amazonaws.com/julialang/bin/osx/x64/${VERSDIR}/$DMG_TARGET"
+    ${ORIG_DIR}/report_nightly.jl "OSX ${OS}" $AWS_URL ${AWS_URL}.log
+done
