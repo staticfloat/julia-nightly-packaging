@@ -29,11 +29,11 @@ for OS in "10.7+" "10.6"; do
     JULIA_VERSION=$(cat VERSION)
 
     # On OSX, we use Accelerate instead of OpenBLAS for now
-    makevars = "$makevars USE_SYSTEM_BLAS=1 USE_BLAS64=0"
+    makevars="$makevars USE_SYSTEM_BLAS=1 USE_BLAS64=0"
 
     # If we're compiling for snow leopard, make sure we use system libunwind
     if [[ "$OS" == "10.6" ]]; then
-        makevars = "$makevars USE_SYSTEM_LIBUNWIND=1"
+        makevars="$makevars USE_SYSTEM_LIBUNWIND=1"
     fi
 
     # Build and test
