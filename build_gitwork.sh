@@ -2,38 +2,20 @@
 
 # This is a common script for all the other build_*.sh scripts.  It does the 
 # droll, unexciting work of checking out the latest (good) git commit, cleaning
-# out old compile artifacts, etc...
+# out old compile artifacts, setting up logging, etc...
 #
 # It needs the following environment variables set in order to work:
-#  ORIG_DIR, BUILD_DIR, JULIA_GIT_BRANCH
+#  ORIG_DIR, OS, JULIA_GIT_BRANCH
 
-# Ensure we can enable logging and have a good builddir
-if [[ -z "$BUILD_DIR" ]]; then
-	echo "ERROR: You must set BUILD_DIR before sourcing this script!" 1>&2
-    exit -1
-fi
-
-if [[ -z "$LOG_FILE" ]]; then
-	echo "ERROR: You must set LOG_FILE before sourcing this script!" 1>&2
-    exit -1
-fi
-rm -f "$LOG_FILE"
-exec > >(tee -a "$LOG_FILE")
-exec 2> >(tee -a "$LOG_FILE" >&2)
-set -x
+# Die on errors.  Very important.  :P
 set -e
 
-function upload_log {
-    echo "Uploading log file $LOG_FILE..."
-    ${ORIG_DIR}/upload_binary.jl $LOG_FILE /logs/$(basename $LOG_FILE)
-}
-# Make SURE that this gets called, even if we die out
-trap upload_log EXIT
-
-JULIA_GIT_URL="https://github.com/JuliaLang/julia.git"
+# Set our build directory
+BUILD_DIR=$(echo ~)/tmp/julia-packaging/${OS}
 mkdir -p $BUILD_DIR
 cd $BUILD_DIR
 
+JULIA_GIT_URL="https://github.com/JuliaLang/julia.git"
 # Checkout julia
 if [[ ! -d "julia-${JULIA_GIT_BRANCH}" ]]; then
     git clone ${JULIA_GIT_URL} julia-${JULIA_GIT_BRANCH}
@@ -41,7 +23,37 @@ fi
 
 # Go into our checkout of JULIA_GIT_URL
 cd julia-${JULIA_GIT_BRANCH}
-rm -rf deps/libuv deps/Rmath # This is the most common failure mode
+
+# Setup some commonly-used variables
+JULIA_VERSION=$(cat VERSION)
+VERSDIR=$(cut -d. -f1-2 < VERSION)
+BANNER="Official http://julialang.org/ release"
+makevars=( VERBOSE=1 TAGGED_RELEASE_BANNER="$BANNER" )
+
+
+# Setup the target we're going to create/upload
+TARGET="julia-${JULIA_VERSION}-${OS}.$BIN_EXT"
+if [[ "$JULIA_GIT_BRANCH" != "master" ]]; then
+    TARGET="julia-${JULIA_VERSION}-$(basename $JULIA_GIT_BRANCH)-${OS}.$BIN_EXT"
+fi
+
+# Setup logging (but still output to stdout)
+LOG_FILE="$BUILD_DIR/${TARGET%.*}.log"
+rm -f "$LOG_FILE"
+exec > >(tee -a "$LOG_FILE")
+exec 2> >(tee -a "$LOG_FILE" >&2)
+set -x
+
+function upload_log {
+    echo "Uploading log file $LOG_FILE..."
+    ${ORIG_DIR}/upload_binary.jl $LOG_FILE /logs/$(basename $LOG_FILE)
+}
+
+# Make SURE that this gets called, even if we die out
+trap upload_log EXIT
+
+# These are the most common failure modes, so clear everything out that we can
+rm -rf deps/libuv deps/Rmath
 rm -f bin/sys*.ji
 git submodule update
 git reset --hard
@@ -67,9 +79,3 @@ if [[ "$?" != 0 ]]; then
     git checkout master
 fi
 set -e
-
-# Set commonly used variables
-JULIA_VERSION=$(cat VERSION)
-VERSDIR=$(cut -d. -f1-2 < VERSION)
-BANNER="Official http://julialang.org/ release"
-makevars=( VERBOSE=1 TAGGED_RELEASE_BANNER="$BANNER" )

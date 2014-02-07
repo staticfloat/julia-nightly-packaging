@@ -31,15 +31,10 @@ if [[ -d .git ]]; then
     git pull -q
 fi
 
+BIN_EXT="dmg"
+
 # We build for 10.7+ and 10.6
 for OS in $OS_LIST; do
-    DMG_TARGET="julia-${JULIA_VERSION}-${OS}.dmg"
-    if [[ "$JULIA_GIT_BRANCH" != "master" ]]; then
-        DMG_TARGET="julia-${JULIA_VERSION}-$(basename $JULIA_GIT_BRANCH)-${OS}.dmg"
-    fi
-    BUILD_DIR=$(echo ~)/tmp/julia-packaging/${OS}
-    LOG_FILE="$BUILD_DIR/${DMG_TARGET%.*}.log"
-
     # Do the gitwork to checkout the latest version of julia, clean everything up, etc...
     source $ORIG_DIR/build_gitwork.sh
 
@@ -62,14 +57,14 @@ for OS in $OS_LIST; do
     # Upload .dmg file if we're not building a given commit
     DMG_SRC=$(ls ${BUILD_DIR}/julia-${JULIA_GIT_BRANCH}/contrib/mac/app/*.dmg)
     if [[ -z "$GIVEN_COMMIT" ]]; then
-        ${ORIG_DIR}/upload_binary.jl $DMG_SRC /bin/osx/x64/$VERSDIR/$DMG_TARGET
+        ${ORIG_DIR}/upload_binary.jl $DMG_SRC /bin/osx/x64/$VERSDIR/$TARGET
         echo "Packaged .dmg available at $DMG_SRC, and uploaded to AWS"
     else
         echo "Packaged .dmg available at $DMG_SRC"
     fi
 
     # Report finished build!
-    ${ORIG_DIR}/report_nightly.jl $OS "https://s3.amazonaws.com/julialang/bin/osx/x64/${VERSDIR}/$DMG_TARGET"
+    ${ORIG_DIR}/report_nightly.jl $OS "https://s3.amazonaws.com/julialang/bin/osx/x64/${VERSDIR}/$TARGET"
 
     # Do this in the ideal case, but it'll get called automatically no matter what
     upload_log

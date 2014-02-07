@@ -9,13 +9,13 @@
 # This script assumes both the 32 and 64-bit toolchains are installed to ~/cross-win{32,64}
 
 if [[ ! -z "$1" ]]; then
-    ARCH_LIST="$1"
-    if [[ "$ARCH_LIST" != "win32" && "$ARCH_LIST" != "win64" ]]; then
+    OS_LIST="$1"
+    if [[ "$OS_LIST" != "win32" && "$OS_LIST" != "win64" ]]; then
         echo "ERROR: can only build for \"win32\" or \"win64\"; not $1!" 1>&2
         exit -1
     fi
 else
-    ARCH_LIST="win32 win64"
+    OS_LIST="win32 win64"
 fi
 
 JULIA_GIT_BRANCH="master"
@@ -32,22 +32,17 @@ if [[ -d .git ]]; then
     git pull -q
 fi
 
+# Set our BIN_EXT
+BIN_EXT="exe"
+
 # We make 32 and 64-bit builds
-for ARCH in $ARCH_LIST; do
-	EXE_TARGET="julia-${JULIA_VERSION}-${ARCH}.exe"
-    if [[ "$JULIA_GIT_BRANCH" != "master" ]]; then
-        EXE_TARGET="julia-${JULIA_VERSION}-$(basename $JULIA_GIT_BRANCH)-${ARCH}.exe"
-    fi
-
-	BUILD_DIR=$(echo ~)/tmp/julia-packaging/$ARCH
-	LOG_FILE="$BUILD_DIR/${EXE_TARGET%.*}.log"
-
+for OS in $OS_LIST; do
 	# Do the gitwork to checkout the latest version of julia, clean everything up, etc...
 	source $ORIG_DIR/build_gitwork.sh
 
-	export PATH=$(echo ~)/cross-$ARCH/bin:$PATH
+	export PATH=$(echo ~)/cross-$OS/bin:$PATH
 	makevars+=( DEFAULT_REPL=basic )
-	if [[ "$ARCH" == "win64" ]]; then
+	if [[ "$OS" == "win64" ]]; then
 		makevars+=( XC_HOST=x86_64-w64-mingw32 )
 	else
 		makevars+=( XC_HOST=i686-w64-mingw32 )
@@ -63,20 +58,20 @@ for ARCH in $ARCH_LIST; do
 
 	# Upload the .exe and report to status.julialang.org:
 	EXE_SRC=$(ls ${BUILD_DIR}/julia-${JULIA_GIT_BRANCH}/julia-*.exe)
-	if [[ "$ARCH" == "win32" ]]; then
-		PROC_ARCH="x86"
+	if [[ "$OS" == "win32" ]]; then
+		PROC_OS="x86"
 	else
-		PROC_ARCH="x64"
+		PROC_OS="x64"
 	fi
 	if [[ -z "$GIVEN_COMMIT" ]]; then
-        ${ORIG_DIR}/upload_binary.jl $EXE_SRC /bin/winnt/$PROC_ARCH/$VERSDIR/$EXE_TARGET
+        ${ORIG_DIR}/upload_binary.jl $EXE_SRC /bin/winnt/$PROC_OS/$VERSDIR/$TARGET
         echo "Packaged .exe available at $EXE_SRC, and uploaded to AWS"
     else
         echo "Packaged .exe available at $EXE_SRC"
     fi
 
     # Report finished build!
-	${ORIG_DIR}/report_nightly.jl $ARCH "http://s3.amazonaws.com/julialang/bin/winnt/${PROC_ARCH}/${VERSDIR}/julia-${JULIA_VERSION}-${ARCH}.exe"
+	${ORIG_DIR}/report_nightly.jl $OS "http://s3.amazonaws.com/julialang/bin/winnt/${PROC_OS}/${VERSDIR}/julia-${JULIA_VERSION}-${OS}.exe"
 
 	# Do this in the ideal case, but it'll get called automatically no matter what
     upload_log
