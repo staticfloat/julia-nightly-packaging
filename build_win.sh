@@ -34,8 +34,13 @@ fi
 
 # We make 32 and 64-bit builds
 for ARCH in $ARCH_LIST; do
+	EXE_TARGET="julia-${JULIA_VERSION}-${ARCH}.exe"
+    if [[ "$JULIA_GIT_BRANCH" != "master" ]]; then
+        EXE_TARGET="julia-${JULIA_VERSION}-$(basename $JULIA_GIT_BRANCH)-${ARCH}.exe"
+    fi
+
 	BUILD_DIR=$(echo ~)/tmp/julia-packaging/$ARCH
-	LOG_FILE=$BUILD_DIR/$ARCH.log
+	LOG_FILE="$BUILD_DIR/${EXE_TARGET%.*}.log"
 
 	# Do the gitwork to checkout the latest version of julia, clean everything up, etc...
 	source $ORIG_DIR/build_gitwork.sh
@@ -55,11 +60,6 @@ for ARCH in $ARCH_LIST; do
 
 	make "${makevars[@]}" win-extras
 	make "${makevars[@]}" dist
-
-	EXE_TARGET="julia-${JULIA_VERSION}-${ARCH}.exe"
-    if [[ "$JULIA_GIT_BRANCH" != "master" ]]; then
-        EXE_TARGET="julia-${JULIA_VERSION}-$(basename $JULIA_GIT_BRANCH)-${ARCH}.exe"
-    fi
 
 	# Upload the .exe and report to status.julialang.org:
 	EXE_SRC=$(ls ${BUILD_DIR}/julia-${JULIA_GIT_BRANCH}/julia-*.exe)

@@ -9,11 +9,13 @@
 
 # Ensure we can enable logging and have a good builddir
 if [[ -z "$BUILD_DIR" ]]; then
-	BUILD_DIR="$(echo ~)/tmp/julia-packaging/$(uname -s)"
+	echo "ERROR: You must set BUILD_DIR before sourcing this script!" 1>&2
+    exit -1
 fi
 
 if [[ -z "$LOG_FILE" ]]; then
-	LOG_FILE="$BUILD_DIR/autonamed.log"
+	echo "ERROR: You must set LOG_FILE before sourcing this script!" 1>&2
+    exit -1
 fi
 rm -f "$LOG_FILE"
 exec > >(tee -a "$LOG_FILE")
@@ -22,6 +24,7 @@ set -x
 set -e
 
 function upload_log {
+    echo "Uploading log file $LOG_FILE..."
     ${ORIG_DIR}/upload_binary.jl $LOG_FILE /logs/$(basename $LOG_FILE)
 }
 # Make SURE that this gets called, even if we die out

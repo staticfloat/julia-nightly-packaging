@@ -33,8 +33,12 @@ fi
 
 # We build for 10.7+ and 10.6
 for OS in $OS_LIST; do
+    DMG_TARGET="julia-${JULIA_VERSION}-${OS}.dmg"
+    if [[ "$JULIA_GIT_BRANCH" != "master" ]]; then
+        DMG_TARGET="julia-${JULIA_VERSION}-$(basename $JULIA_GIT_BRANCH)-${OS}.dmg"
+    fi
     BUILD_DIR=$(echo ~)/tmp/julia-packaging/${OS}
-    LOG_FILE=$BUILD_DIR/$OS.log
+    LOG_FILE="$BUILD_DIR/${DMG_TARGET%.*}.log"
 
     # Do the gitwork to checkout the latest version of julia, clean everything up, etc...
     source $ORIG_DIR/build_gitwork.sh
@@ -54,11 +58,6 @@ for OS in $OS_LIST; do
     # Make special packaging makefile
     cd contrib/mac/app
     make $makevars
-
-    DMG_TARGET="julia-${JULIA_VERSION}-${OS}.dmg"
-    if [[ "$JULIA_GIT_BRANCH" != "master" ]]; then
-        DMG_TARGET="julia-${JULIA_VERSION}-$(basename $JULIA_GIT_BRANCH)-${OS}.dmg"
-    fi
 
     # Upload .dmg file if we're not building a given commit
     DMG_SRC=$(ls ${BUILD_DIR}/julia-${JULIA_GIT_BRANCH}/contrib/mac/app/*.dmg)
