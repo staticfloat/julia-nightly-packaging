@@ -8,9 +8,19 @@
 #   https://github.com/JuliaLang/julia/blob/master/README.windows.md
 # This script assumes both the 32 and 64-bit toolchains are installed to ~/cross-win{32,64}
 
-JULIA_GIT_BRANCH="master"
 if [[ ! -z "$1" ]]; then
-    JULIA_GIT_BRANCH="$1"
+    ARCH_LIST="$1"
+    if [[ "$ARCH_LIST" != "win32" && "$ARCH_LIST" != "win64" ]]; then
+        echo "ERROR: can only build for \"win32\" or \"win64\"; not $1!" 1>&2
+        exit -1
+    fi
+else
+    ARCH_LIST="win32 win64"
+fi
+
+JULIA_GIT_BRANCH="master"
+if [[ ! -z "$2" ]]; then
+    JULIA_GIT_BRANCH="$2"
 fi
 
 # Find out where we live
@@ -23,7 +33,7 @@ if [[ -d .git ]]; then
 fi
 
 # We make 32 and 64-bit builds
-for ARCH in win32 win64; do
+for ARCH in $ARCH_LIST; do
 	BUILD_DIR=$(echo ~)/tmp/julia-packaging/$ARCH
 	LOG_FILE=$BUILD_DIR/$ARCH.log
 
@@ -59,8 +69,8 @@ for ARCH in win32 win64; do
 	else
 		PROC_ARCH="x64"
 	fi
-	${ORIG_DIR}/upload_binary.jl $EXE_SRC $LOG_FILE "/bin/winnt/${PROC_ARCH}/${VERSDIR}/${EXE_TARGET}"
+	${ORIG_DIR}/upload_binary.jl $EXE_SRC "/bin/winnt/${PROC_ARCH}/${VERSDIR}/${EXE_TARGET}"
 
 	AWS_URL="http://s3.amazonaws.com/julialang/bin/winnt/${PROC_ARCH}/${VERSDIR}/julia-${JULIA_VERSION}-${ARCH}.exe"
-	${ORIG_DIR}/report_nightly.jl $ARCH $AWS_URL ${AWS_URL}.log
+	${ORIG_DIR}/report_nightly.jl $ARCH $AWS_URL
 done

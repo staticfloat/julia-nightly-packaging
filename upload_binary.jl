@@ -6,13 +6,12 @@
 # Example:
 #   ./upload_binary.jl /tmp/Julia-0.2-pre.dmg /bin/osx/x64/0.2/julia-0.2-unstable.dmg
 
-if length(ARGS) != 3
-    error( "Usage: ./upload_binary.jl <file> <log file> <upload_path>")
+if length(ARGS) < 2
+    error( "Usage: ./upload_binary.jl <file> <upload_path>")
 end
 
 file = ARGS[1]
-logfile = ARGS[2]
-key = ARGS[3]
+key = ARGS[2]
 
 if !isfile(file)
     error( "Could not open binary $file" )
@@ -23,8 +22,6 @@ if !isfile(logfile)
 end
 
 f = open(file, "r")
-l = open(logfile, "r")
-
 
 # Man, these take a long time to load. :(
 using AWS
@@ -37,9 +34,5 @@ acl.acl = "public-read"
 S3.put_object(env, "julialang", key, f)
 S3.put_object_acl(env, "julialang", key, acl )
 close(f)
-
-S3.put_object(env, "julialang", "$key.log", l)
-S3.put_object_acl(env, "julialang", "$key.log", acl )
-close(l)
 
 println("$key uploaded successfully")

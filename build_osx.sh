@@ -4,13 +4,22 @@
 # This script functions best when the following are installed:
 #   git, python (with the "requests" module installed, for Travis-CI API), playtpus (must be in path)
 
+# This script builds both the 10.7+ compatible binary as well as the 10.6-compatible binary by default
+# Override this by passing in either 10.7+ or 10.6 as the first argument to the script
 
-# This script builds both the 10.7+ compatible binary as well as the 10.6-compatible binary
-
+if [[ ! -z "$1" ]]; then
+    OS_LIST="$1"
+    if [[ "$OS_LIST" != "10.7+" && "$OS_LIST" != "10.6" ]]; then
+        echo "ERROR: can only build for \"10.7+\" or \"10.6\"; not $1!" 1>&2
+        exit -1
+    fi
+else
+    OS_LIST="10.7+ 10.6"
+fi
 
 JULIA_GIT_BRANCH="master"
-if [[ ! -z "$1" ]]; then
-    JULIA_GIT_BRANCH="$1"
+if [[ ! -z "$2" ]]; then
+    JULIA_GIT_BRANCH="$2"
 fi
 
 # Find out where we live
@@ -23,7 +32,7 @@ if [[ -d .git ]]; then
 fi
 
 # We build for 10.7+ and 10.6
-for OS in "10.7+" "10.6"; do
+for OS in $OS_LIST; do
     BUILD_DIR=$(echo ~)/tmp/julia-packaging/osx${OS}
     LOG_FILE=$BUILD_DIR/$OS.log
 
@@ -54,7 +63,7 @@ for OS in "10.7+" "10.6"; do
     # Upload .dmg file if we're not building a given commit
     DMG_SRC=$(ls ${BUILD_DIR}/julia-${JULIA_GIT_BRANCH}/contrib/mac/app/*.dmg)
     if [[ -z "$GIVEN_COMMIT" ]]; then
-        ${ORIG_DIR}/upload_binary.jl $DMG_SRC $LOG_FILE /bin/osx/x64/${VERSDIR}/$DMG_TARGET
+        ${ORIG_DIR}/upload_binary.jl $DMG_SRC /bin/osx/x64/${VERSDIR}/$DMG_TARGET
         echo "Packaged .dmg available at $DMG_SRC, and uploaded to AWS"
     else
         echo "Packaged .dmg available at $DMG_SRC"
@@ -62,5 +71,8 @@ for OS in "10.7+" "10.6"; do
 
     # Report finished build!
     AWS_URL="https://s3.amazonaws.com/julialang/bin/osx/x64/${VERSDIR}/$DMG_TARGET"
-    ${ORIG_DIR}/report_nightly.jl "OSX ${OS}" $AWS_URL ${AWS_URL}.log
+    ${ORIG_DIR}/report_nightly.jl "OSX ${OS}" $AWS_URL
+
+    # Do this in the ideal case, but it'll get called automatically no matter what
+    upload_log
 done

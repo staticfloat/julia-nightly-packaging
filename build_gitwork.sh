@@ -21,6 +21,12 @@ exec 2> >(tee -a "$LOG_FILE" >&2)
 set -x
 set -e
 
+function upload_log {
+    ${ORIG_DIR}/upload_binary.jl $LOG_FILE /logs/$(basename $LOG_FILE)
+}
+# Make SURE that this gets called, even if we die out
+trap upload_log EXIT
+
 JULIA_GIT_URL="https://github.com/JuliaLang/julia.git"
 mkdir -p $BUILD_DIR
 cd $BUILD_DIR
