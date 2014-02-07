@@ -63,14 +63,21 @@ for ARCH in $ARCH_LIST; do
 
 	# Upload the .exe and report to status.julialang.org:
 	EXE_SRC=$(ls ${BUILD_DIR}/julia-${JULIA_GIT_BRANCH}/julia-*.exe)
-	echo "Bundled .exe available at $EXE_SRC"
 	if [[ "$ARCH" == "win32" ]]; then
 		PROC_ARCH="x86"
 	else
 		PROC_ARCH="x64"
 	fi
-	${ORIG_DIR}/upload_binary.jl $EXE_SRC "/bin/winnt/${PROC_ARCH}/${VERSDIR}/${EXE_TARGET}"
+	if [[ -z "$GIVEN_COMMIT" ]]; then
+        ${ORIG_DIR}/upload_binary.jl $EXE_SRC /bin/winnt/$PROC_ARCH/$VERSDIR/$EXE_TARGET
+        echo "Packaged .exe available at $EXE_SRC, and uploaded to AWS"
+    else
+        echo "Packaged .exe available at $EXE_SRC"
+    fi
 
-	AWS_URL="http://s3.amazonaws.com/julialang/bin/winnt/${PROC_ARCH}/${VERSDIR}/julia-${JULIA_VERSION}-${ARCH}.exe"
-	${ORIG_DIR}/report_nightly.jl $ARCH $AWS_URL
+    # Report finished build!
+	${ORIG_DIR}/report_nightly.jl $ARCH "http://s3.amazonaws.com/julialang/bin/winnt/${PROC_ARCH}/${VERSDIR}/julia-${JULIA_VERSION}-${ARCH}.exe"
+
+	# Do this in the ideal case, but it'll get called automatically no matter what
+    upload_log
 done

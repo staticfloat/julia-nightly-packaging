@@ -57,20 +57,19 @@ for OS in $OS_LIST; do
 
     # Make special packaging makefile
     cd contrib/mac/app
-    make $makevars
+    make "${makevars[@]}"
 
     # Upload .dmg file if we're not building a given commit
     DMG_SRC=$(ls ${BUILD_DIR}/julia-${JULIA_GIT_BRANCH}/contrib/mac/app/*.dmg)
     if [[ -z "$GIVEN_COMMIT" ]]; then
-        ${ORIG_DIR}/upload_binary.jl $DMG_SRC /bin/osx/x64/${VERSDIR}/$DMG_TARGET
+        ${ORIG_DIR}/upload_binary.jl $DMG_SRC /bin/osx/x64/$VERSDIR/$DMG_TARGET
         echo "Packaged .dmg available at $DMG_SRC, and uploaded to AWS"
     else
         echo "Packaged .dmg available at $DMG_SRC"
     fi
 
     # Report finished build!
-    AWS_URL="https://s3.amazonaws.com/julialang/bin/osx/x64/${VERSDIR}/$DMG_TARGET"
-    ${ORIG_DIR}/report_nightly.jl "${OS}" $AWS_URL
+    ${ORIG_DIR}/report_nightly.jl $OS "https://s3.amazonaws.com/julialang/bin/osx/x64/${VERSDIR}/$DMG_TARGET"
 
     # Do this in the ideal case, but it'll get called automatically no matter what
     upload_log
