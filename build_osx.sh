@@ -9,12 +9,12 @@
 
 if [[ ! -z "$1" ]]; then
     OS_LIST="$1"
-    if [[ "$OS_LIST" != "10.7+" && "$OS_LIST" != "10.6" ]]; then
-        echo "ERROR: can only build for \"10.7+\" or \"10.6\"; not $1!" 1>&2
+    if [[ "$OS_LIST" != "osx10.7+" && "$OS_LIST" != "osx10.6" ]]; then
+        echo "ERROR: can only build for \"osx10.7+\" or \"osx10.6\"; not $1!" 1>&2
         exit -1
     fi
 else
-    OS_LIST="10.7+ 10.6"
+    OS_LIST="osx10.7+ osx10.6"
 fi
 
 JULIA_GIT_BRANCH="master"
@@ -33,7 +33,7 @@ fi
 
 # We build for 10.7+ and 10.6
 for OS in $OS_LIST; do
-    BUILD_DIR=$(echo ~)/tmp/julia-packaging/osx${OS}
+    BUILD_DIR=$(echo ~)/tmp/julia-packaging/${OS}
     LOG_FILE=$BUILD_DIR/$OS.log
 
     # Do the gitwork to checkout the latest version of julia, clean everything up, etc...
@@ -71,7 +71,7 @@ for OS in $OS_LIST; do
 
     # Report finished build!
     AWS_URL="https://s3.amazonaws.com/julialang/bin/osx/x64/${VERSDIR}/$DMG_TARGET"
-    ${ORIG_DIR}/report_nightly.jl "OSX ${OS}" $AWS_URL
+    ${ORIG_DIR}/report_nightly.jl "${OS}" $AWS_URL
 
     # Do this in the ideal case, but it'll get called automatically no matter what
     upload_log
