@@ -17,10 +17,6 @@ if !isfile(file)
     error( "Could not open binary $file" )
 end
 
-if !isfile(logfile)
-	error( "Could not open logfile $logfile")
-end
-
 f = open(file, "r")
 
 # Man, these take a long time to load. :(
