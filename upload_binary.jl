@@ -24,11 +24,18 @@ using AWS
 using AWS.S3
 
 env = AWSEnv()
+
+# Upload the actual file (if it's a .log file, set the content_type to "text/plain"
+if file[end-3:end] == ".log"
+    S3.put_object(env, "julialang", key, f, content_type="text/plain")
+else
+    S3.put_object(env, "julialang", key, f)
+end
+close(f)
+
+# Make it readable by everyone
 acl = S3.S3_ACL()
 acl.acl = "public-read"
-
-S3.put_object(env, "julialang", key, f)
 S3.put_object_acl(env, "julialang", key, acl )
-close(f)
 
 println("$key uploaded successfully")
