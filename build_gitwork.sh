@@ -39,7 +39,7 @@ fi
 
 # Setup logging (but still output to stdout)
 LOG_FILE="$BUILD_DIR/${TARGET%.*}.log"
-rm -f "$LOG_FILE"
+echo "" > "$LOG_FILE"
 exec > "$LOG_FILE" # >(tee -a "$LOG_FILE")
 exec 2>"$LOG_FILE" # >(tee -a "$LOG_FILE" >&2)
 set -x
