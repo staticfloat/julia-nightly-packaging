@@ -40,8 +40,8 @@ fi
 # Setup logging (but still output to stdout)
 LOG_FILE="$BUILD_DIR/${TARGET%.*}.log"
 rm -f "$LOG_FILE"
-exec > >(tee -a "$LOG_FILE")
-exec 2> >(tee -a "$LOG_FILE" >&2)
+exec > "$LOG_FILE" # >(tee -a "$LOG_FILE")
+exec 2>"$LOG_FILE" # >(tee -a "$LOG_FILE" >&2)
 set -x
 
 function upload_log {
