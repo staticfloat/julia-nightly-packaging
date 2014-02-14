@@ -43,6 +43,8 @@ echo "" > "$LOG_FILE"
 exec > "$LOG_FILE" # >(tee -a "$LOG_FILE")
 exec 2>"$LOG_FILE" # >(tee -a "$LOG_FILE" >&2)
 set -x
+# Show the date so that the log files make a little more sense
+date
 
 function upload_log {
     echo "Uploading log file $LOG_FILE..."
