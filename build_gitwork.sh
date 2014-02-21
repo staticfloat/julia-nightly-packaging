@@ -62,6 +62,7 @@ git reset --hard
 git checkout ${JULIA_GIT_BRANCH}
 git fetch
 git reset --hard origin/${JULIA_GIT_BRANCH}
+make cleanall
 
 # Find the last commit that passed a Travis build
 set +e
