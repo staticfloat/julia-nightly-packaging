@@ -56,13 +56,16 @@ trap upload_log EXIT
 
 # These are the most common failure modes, so clear everything out that we can
 rm -rf deps/libuv deps/Rmath
+rm -f usr/bin/libuv*
+rm -f usr/bin/libsupport*
 rm -f bin/sys*.ji
 git submodule update
 git reset --hard
 git checkout ${JULIA_GIT_BRANCH}
 git fetch
 git reset --hard origin/${JULIA_GIT_BRANCH}
-make cleanall
+make -C deps clean-openlibm
+make -j1 cleanall
 
 # Find the last commit that passed a Travis build
 set +e
