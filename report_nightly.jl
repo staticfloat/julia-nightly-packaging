@@ -8,9 +8,10 @@ end
 using HTTPClient.HTTPC
 
 target = ARGS[1]
-url = ARGS[2]
+version = ARGS[2]
+url = ARGS[3]
 
-json = "{\"target\": \"$target\", \"url\":\"$url\"}"
+json = "{\"target\": \"$target\", \"url\":\"$url\", \"version\":\"$version\"}"
 ro = RequestOptions( content_type = "application/json" )
 
 post("http://status.julialang.org/put/nightly", json ) 
