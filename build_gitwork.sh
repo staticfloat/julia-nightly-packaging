@@ -34,15 +34,17 @@ makevars=( VERBOSE=1 TAGGED_RELEASE_BANNER="${BANNER}" )
 LOG_FILE="$BUILD_DIR/julia-${JULIA_VERSION}-${OS}.log"
 function upload_log {
     echo "Uploading log file $LOG_FILE..."
-    ${ORIG_DIR}/upload_binary.jl $LOG_FILE logs/$(basename $LOGFILE).log
+    ${ORIG_DIR}/upload_binary.jl $LOG_FILE logs/$(basename $LOG_FILE).log
 }
 
 # Make SURE that this gets called, even if we die out
 trap upload_log EXIT
 
 echo "" > "$LOG_FILE"
-exec > "$LOG_FILE" # >(tee -a "$LOG_FILE")
-exec 2>"$LOG_FILE" # >(tee -a "$LOG_FILE" >&2)
+exec > "$LOG_FILE"
+exec 2>"$LOG_FILE"
+#exec >  >(tee -a "$LOG_FILE")
+#exec 2> >(tee -a "$LOG_FILE" >&2)
 set -x
 # Show the date so that the log files make a little more sense
 date

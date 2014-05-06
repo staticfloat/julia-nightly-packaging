@@ -1,7 +1,7 @@
 #!/usr/bin/env julia
 
-if length(ARGS) < 2
-    println( "Usage: ./report_nightly.jl \"target\" \"url\"" )
+if length(ARGS) < 3
+    println( "Usage: ./report_nightly.jl \"target\" \"commit\" \"url\"" )
     exit( -1 )
 end
 
