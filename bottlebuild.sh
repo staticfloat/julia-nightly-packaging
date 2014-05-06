@@ -13,7 +13,7 @@ fi
 BOTTLE_DIR=/tmp/bottles
 
 brew=$(which brew)
-deps=$($brew deps -1 -n $1)
+deps=$($brew deps -n $1)
 deps="$deps $1"
 mkdir -p $BOTTLE_DIR
 pushd $BOTTLE_DIR >/dev/null
