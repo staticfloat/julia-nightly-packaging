@@ -64,4 +64,4 @@ else
 fi
 
 # Report finished build!
-${ORIG_DIR}/report_nightly.jl $OS "https://s3.amazonaws.com/julialang/bin/osx/x64/${VERSDIR}/$TARGET"
+${ORIG_DIR}/report_nightly.jl $OS $JULIA_COMMIT "https://s3.amazonaws.com/julianightlies/bin/osx/x64/${VERSDIR}/$TARGET"

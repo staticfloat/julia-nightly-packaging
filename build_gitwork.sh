@@ -30,29 +30,24 @@ VERSDIR=$(cut -d. -f1-2 < VERSION)
 BANNER="Official http://julialang.org/ release"
 makevars=( VERBOSE=1 TAGGED_RELEASE_BANNER="${BANNER}" )
 
-
-# Setup the target we're going to create/upload
-TARGET="julia-${JULIA_VERSION}-${OS}.$BIN_EXT"
-if [[ "$JULIA_GIT_BRANCH" != "master" ]]; then
-    TARGET="julia-${JULIA_VERSION}-$(basename $JULIA_GIT_BRANCH)-${OS}.$BIN_EXT"
-fi
-
 # Setup logging (but still output to stdout)
-LOG_FILE="$BUILD_DIR/${TARGET%.*}.log"
-echo "" > "$LOG_FILE"
-exec > "$LOG_FILE" # >(tee -a "$LOG_FILE")
-exec 2>"$LOG_FILE" # >(tee -a "$LOG_FILE" >&2)
-set -x
-# Show the date so that the log files make a little more sense
-date
-
+LOG_FILE="$BUILD_DIR/julia-${JULIA_VERSION}-${OS}.log"
 function upload_log {
     echo "Uploading log file $LOG_FILE..."
-    ${ORIG_DIR}/upload_binary.jl $LOG_FILE /logs/$(basename $LOG_FILE)
+    ${ORIG_DIR}/upload_binary.jl $LOG_FILE logs/$(basename $LOG_FILE).log
 }
 
 # Make SURE that this gets called, even if we die out
 trap upload_log EXIT
+
+echo "" > "$LOG_FILE"
+exec > "$LOG_FILE"
+exec 2>"$LOG_FILE"
+#exec >  >(tee -a "$LOG_FILE")
+#exec 2> >(tee -a "$LOG_FILE" >&2)
+set -x
+# Show the date so that the log files make a little more sense
+date
 
 # These are the most common failure modes, so clear everything out that we can
 rm -rf deps/libuv deps/Rmath
@@ -84,4 +79,13 @@ if [[ "$?" != 0 ]]; then
     echo "Couldn't checkout last good commit, going with master/HEAD!"
     git checkout master
 fi
+
+
+# Setup the target we're going to create/upload
+JULIA_COMMIT=$(git rev-parse --short HEAD)
+TARGET="julia-${JULIA_VERSION}-${JULIA_COMMIT}-${OS}.$BIN_EXT"
+if [[ "$JULIA_GIT_BRANCH" != "master" ]]; then
+    TARGET="julia-${JULIA_VERSION}-$(basename $JULIA_GIT_BRANCH)-$(JULIA_COMMIT)-${OS}.$BIN_EXT"
+fi
+
 set -e
