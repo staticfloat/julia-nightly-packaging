@@ -25,11 +25,12 @@ using AWS.S3
 
 env = AWSEnv()
 
-# Upload the actual file (if it's a .log file, set the content_type to "text/plain"
+# Upload the actual file (if it's a .log file, set the content_type to "text/plain",
+# if it's not a .log file, then upload it to the "julianightlies" bucket instead)
 if file[end-3:end] == ".log"
     S3.put_object(env, "julialang", key, f, content_type="text/plain")
 else
-    S3.put_object(env, "julialang", key, f)
+    S3.put_object(env, "julianightlies", key, f)
 end
 close(f)
 
