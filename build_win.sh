@@ -72,4 +72,4 @@ else
 fi
 
 # Report finished build!
-${ORIG_DIR}/report_nightly.jl $OS $JULIA_COMMIT "http://s3.amazonaws.com/julialang/bin/winnt/${PROC_OS}/${VERSDIR}/julia-${JULIA_VERSION}-${OS}.exe"
+${ORIG_DIR}/report_nightly.jl $OS $JULIA_COMMIT "http://s3.amazonaws.com/julianightlies/bin/winnt/${PROC_OS}/${VERSDIR}/julia-${JULIA_VERSION}-${OS}.exe"
