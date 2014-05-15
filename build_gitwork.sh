@@ -30,25 +30,6 @@ VERSDIR=$(cut -d. -f1-2 < VERSION)
 BANNER="Official http://julialang.org/ release"
 makevars=( VERBOSE=1 TAGGED_RELEASE_BANNER="${BANNER}" )
 
-# Setup logging (but still output to stdout)
-LOG_FILE="$BUILD_DIR/julia-${JULIA_VERSION}-${OS}.log"
-function upload_log {
-    echo "Uploading log file $LOG_FILE..."
-    ${ORIG_DIR}/upload_binary.jl $LOG_FILE logs/$(basename $LOG_FILE).log
-}
-
-# Make SURE that this gets called, even if we die out
-trap upload_log EXIT
-
-echo "" > "$LOG_FILE"
-exec > "$LOG_FILE"
-exec 2>"$LOG_FILE"
-#exec >  >(tee -a "$LOG_FILE")
-#exec 2> >(tee -a "$LOG_FILE" >&2)
-set -x
-# Show the date so that the log files make a little more sense
-date
-
 # These are the most common failure modes, so clear everything out that we can
 rm -rf deps/libuv deps/Rmath
 rm -f usr/bin/libuv*
@@ -88,4 +69,29 @@ if [[ "$JULIA_GIT_BRANCH" != "master" ]]; then
     TARGET="julia-${JULIA_VERSION}-$(basename $JULIA_GIT_BRANCH)-$(JULIA_COMMIT)-${OS}.$BIN_EXT"
 fi
 
+
+# Setup logging
+LOG_FILE="$BUILD_DIR/${TARGET%.*}.log"
+function upload_log {
+    echo "Uploading log file $LOG_FILE..."
+    ${ORIG_DIR}/upload_binary.jl $LOG_FILE logs/$(basename $LOG_FILE)
+}
+
+# Make SURE that this gets called, even if we die out
+trap upload_log EXIT
+
+echo "" > "$LOG_FILE"
+# The cool redirection seems to fail under wine, unfortunately
+if [[ $OS == win* ]]; then
+    exec > "$LOG_FILE"
+    exec 2>"$LOG_FILE"
+else
+    exec >  >(tee -a "$LOG_FILE")
+    exec 2> >(tee -a "$LOG_FILE" >&2)
+fi
+set -x
+
+# Show the date so that the log files make a little more sense
+date
+echo "Building $TARGET"
 set -e
