@@ -1,11 +1,8 @@
 #!/bin/bash
 
 # This script invoked by a cron job every X hours
-# This script functions best when the following are installed:
-#   git, python (with the "requests" module installed, for Travis-CI API), playtpus (must be in path)
-
-# This script builds both the 10.7+ compatible binary as well as the 10.6-compatible binary by default
-# Override this by passing in either 10.7+ or 10.6 as the first argument to the script
+# This script functions best when the following are installed and on the system path:
+#   git, julia (+ Request package), playtpus
 
 if [[ ! -z "$1" ]]; then
     OS="$1"
@@ -39,7 +36,7 @@ BIN_EXT="dmg"
 source $ORIG_DIR/build_gitwork.sh
 
 # On OSX, we use Accelerate instead of OpenBLAS for now
-makevars+=( USE_SYSTEM_BLAS=1 USE_BLAS64=0 )
+makevars+=( USE_SYSTEM_BLAS=1 USE_BLAS64=0 JULIA_CPU_TARGET=core2 )
 
 # If we're compiling for snow leopard, make sure we use system libunwind
 if [[ "$OS" == "10.6" ]]; then
