@@ -28,7 +28,7 @@ cd julia-${JULIA_GIT_BRANCH}
 JULIA_VERSION=$(cat VERSION)
 VERSDIR=$(cut -d. -f1-2 < VERSION)
 BANNER="Official http://julialang.org/ release"
-makevars=( VERBOSE=1 TAGGED_RELEASE_BANNER="${BANNER}" JULIA_CPU_TARGET=core2 )
+makevars=( VERBOSE=1 TAGGED_RELEASE_BANNER="${BANNER}" )
 
 # These are the most common failure modes, so clear everything out that we can
 rm -rf deps/libuv deps/Rmath
