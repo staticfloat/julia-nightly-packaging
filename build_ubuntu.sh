@@ -74,7 +74,7 @@ git submodule init
 git submodule update
 
 # Hack to get around our lack of packaging of Rmath
-make -C deps get-random
+make -C deps get-dsfmt
 
 # same for utf8proc
 make -C deps get-utf8proc
