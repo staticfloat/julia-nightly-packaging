@@ -35,8 +35,8 @@ BIN_EXT="dmg"
 # Do the gitwork to checkout the latest version of julia, clean everything up, etc...
 source $ORIG_DIR/build_gitwork.sh
 
-# On OSX, we use Accelerate instead of OpenBLAS for now
-makevars+=( USE_SYSTEM_BLAS=1 USE_BLAS64=0 JULIA_CPU_TARGET=core2 )
+# Target a slightly older CPU model so that we are maximally compatible
+makevars+=( JULIA_CPU_TARGET=core2 )
 
 # If we're compiling for snow leopard, make sure we use system libunwind
 if [[ "$OS" == "10.6" ]]; then
