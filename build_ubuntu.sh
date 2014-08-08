@@ -79,12 +79,16 @@ make -C deps get-dsfmt
 # same for utf8proc
 make -C deps get-utf8proc
 
+# We're going to compile LLVM as well!
+make -C deps get-llvm
+
 # Work around our lack of git on buildd servers
 make -C base version_git.jl.phony
 
 # Make it blaringly obvious to everyone that this is a git build when they start up Julia-
+JULIA_VERSION=$(cat ./VERSION)
 DATECOMMIT=$(git log --pretty=format:'%cd' --date=short -n 1 | tr -d '-')
-echo "Syncing commit 0.2.0+nightly$DATECOMMIT."
+echo "Syncing commit ${JULIA_VERSION}+$DATECOMMIT."
 cd ..
 
 # Now go into the bzr branch and copy everything over
@@ -97,7 +101,6 @@ cp -r ../julia-${JULIA_GIT_BRANCH}/* .
 cp -r ../debian-${DEBIAN_GIT_BRANCH}/debian .
 
 # Also, increment the current debian changelog, so we get git version tagged binaries
-JULIA_VERSION=$(cat ./VERSION)
 dch -v "${JULIA_VERSION}+$DATECOMMIT" "nightly git build"
 
 bzr add
