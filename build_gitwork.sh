@@ -9,6 +9,7 @@
 
 # Die on errors.  Very important.  :P
 set -e
+echo "Starting gitwork"
 
 # Set our build directory
 BUILD_DIR=$(echo ~)/tmp/julia-packaging/${OS}
@@ -54,7 +55,7 @@ if [[ -z "$GIVEN_COMMIT" ]]; then
 else
     LAST_GOOD_COMMIT="$GIVEN_COMMIT"
 fi
-
+echo "Checking out LAST_GOOD_COMMIT: $LAST_GOOD_COMMIT"
 git checkout -B ${JULIA_GIT_BRANCH} $LAST_GOOD_COMMIT
 if [[ "$?" != 0 ]]; then
     echo "Couldn't checkout last good commit, going with master/HEAD!"

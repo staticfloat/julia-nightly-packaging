@@ -41,13 +41,17 @@ BIN_EXT="exe"
 #Do the gitwork to checkout the latest version of julia, clean everything up, etc...
 source $ORIG_DIR/build_gitwork.sh
 
-export PATH=$(echo ~)/cross-$OS/bin:$PATH
-makevars+=( DEFAULT_REPL=basic )
+export PATH=$(echo ~)/mgwx/cross-$OS/bin:$PATH
+makevars+=( -j1 DEFAULT_REPL=basic )
+
 if [[ "$OS" == "win64" ]]; then
     makevars+=( XC_HOST=x86_64-w64-mingw32 )
 else
     makevars+=( XC_HOST=i686-w64-mingw32 )
 fi
+
+echo "  Command line:"
+echo "    make ${makevars[@]}"
 
 # Ignore errors during these steps.  I don't really like this, as it makes it impossible to determine if the build failed, but oh well
 set +e
@@ -64,8 +68,10 @@ if [[ "$OS" == "win32" ]]; then
 else
     PROC_OS="x64"
 fi
+AWS_PATH="/bin/winnt/$PROC_OS/$VERSDIR/$TARGET"
 if [[ -z "$GIVEN_COMMIT" ]]; then
-    ${ORIG_DIR}/upload_binary.jl $EXE_SRC /bin/winnt/$PROC_OS/$VERSDIR/$TARGET
+    ${ORIG_DIR}/upload_binary.jl $EXE_SRC $AWS_PATH
+    echo "UPLOAD: ${ORIG_DIR}/upload_binary.jl $EXE_SRC $AWS_PATH"
     echo "Packaged .exe available at $EXE_SRC, and uploaded to AWS"
 else
     echo "Packaged .exe available at $EXE_SRC"
